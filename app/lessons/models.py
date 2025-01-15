@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from users.models import MyUser
 from courses.models import Module
 from django_ckeditor_5.fields import CKEditor5Field
 
@@ -38,7 +39,7 @@ class Problem(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     language = models.ManyToManyField(Language,related_name='problems_in_language')
     title = models.CharField(max_length=200, blank=True, null=True)
-    description = CKEditor5Field(max_length=500, verbose_name='Краткое описание', config_name='extends')
+    description = CKEditor5Field(verbose_name='Darslik yoki Problems', config_name='extends')
     difficulty_choices = [
         ('easy', 'Easy'),
         ('medium', 'Medium'),
@@ -73,7 +74,7 @@ class TestCase(models.Model):
 
 
 class Submission(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
     code = models.TextField()  # Foydalanuvchi yuborgan kod
     status_choices = [

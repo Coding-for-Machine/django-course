@@ -18,5 +18,4 @@ class AlgorithmTestAdmin(admin.ModelAdmin):
 admin.site.register(AlgorithmTest, AlgorithmTestAdmin)
 
 admin.site.register(TestCase)  
-admin.site.register(Submission)
 admin.site.register(Problem)

@@ -1,6 +1,7 @@
 from django.db import models
+
+from users.models import MyUser
 # Kurs modeli - kurslar haqida asosiy ma'lumotlarni saqlash uchun
-from django.contrib.auth.models import User
 
 class Course(models.Model):
     title = models.CharField(max_length=255)
@@ -27,7 +28,7 @@ class Course(models.Model):
 
 
 class Enrollment(models.Model):
-    user = models.ForeignKey(User, related_name='enrollments', on_delete=models.CASCADE)
+    user = models.ForeignKey(MyUser, related_name='enrollments', on_delete=models.CASCADE)
     course = models.ForeignKey(Course, related_name='enrollments', on_delete=models.CASCADE)
     enrolled_at = models.DateTimeField(auto_now_add=True)
     is_paid = models.BooleanField(default=False)  # To'lov tasdiqlanganligi

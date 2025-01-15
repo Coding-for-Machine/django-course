@@ -28,9 +28,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'courses',
     'lessons',
-    'users',
+    'users.apps.UsersConfig',
+    'savollar',
     'django_ckeditor_5',
+
 ]
+
+AUTH_USER_MODEL = "users.MyUser"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
