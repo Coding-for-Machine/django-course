@@ -10,10 +10,24 @@ class TestCaseSchema(BaseModel):
     class Config:
         orm_mode = True  # Django ORM obyektlarini to'g'ri seriyalash
 
+class LanguageSchema(BaseModel):
+    name: str
+    slug: str
+    class Config:
+        orm_mode =True
+
+# advanced_test
+class AdvancedTestSchema(BaseModel):
+    code: str
+    class Config:
+        orm_mode = True  
+
 # AlgorithmTest Schema
 class AlgorithmTestSchema(BaseModel):
     algorithm: str
     algorithmtest: str
+    language: List[LanguageSchema]
+    advanced_test: List[AdvancedTestSchema]
     test_cases: List[TestCaseSchema]
 
     class Config:
@@ -23,6 +37,7 @@ class AlgorithmTestSchema(BaseModel):
 class ProblemSchema(BaseModel):
     id: int
     title: str
+    slug: str | None
     description: str
     difficulty: str
     test_cases: List[AlgorithmTestSchema]  # Muammoga tegishli testlar
@@ -32,17 +47,3 @@ class ProblemSchema(BaseModel):
     class Config:
         orm_mode = True
 
-# Lesson Schema
-class LessonSchema(BaseModel):
-    id: int
-    title: str
-    slug: str
-    lesson_type: str
-    locked: bool
-    preview: bool
-    created_at: datetime
-    updated_at: datetime
-    problems: List[ProblemSchema]  # Darsga tegishli muammolar
-
-    class Config:
-        orm_mode = True

@@ -12,6 +12,11 @@ class Language(models.Model):
     def __str__(self):
         return self.name
     
+class AdvancedTest(models.Model):
+    code = models.TextField()
+    def __str__(self):
+        return f"{self.id}---AdvancedTest"
+    
 # Dars modeli - har bir modulga tegishli darslarni saqlash uchun
 class Lesson(models.Model):
     module = models.ForeignKey(Module, related_name='lessons', on_delete=models.CASCADE)  # Modulga bog'lanadi
@@ -29,7 +34,7 @@ class Lesson(models.Model):
     updated_at = models.DateTimeField(auto_now=True)  # Dars yangilanish vaqti
 
     def __str__(self):
-        return f"Lesson: {self.title} (Module: {self.module.title})"  # Dars nomi va tegishli modul nomini ko'rsatish
+        return f"Lesson: (Module: {self.module.title})"  # Dars nomi va tegishli modul nomini ko'rsatish
 
     class Meta:
         ordering = ['created_at']  # Darslar yaratish vaqtiga ko'ra tartiblanadi
@@ -39,6 +44,7 @@ class Problem(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     language = models.ManyToManyField(Language,related_name='problems_in_language')
     title = models.CharField(max_length=200, blank=True, null=True)
+    slug = models.SlugField(max_length=250, blank=True, null=True)
     description = CKEditor5Field(verbose_name='Darslik yoki Problems', config_name='extends')
     difficulty_choices = [
         ('easy', 'Easy'),
@@ -51,11 +57,14 @@ class Problem(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.title
+        if self.title:
+            return self.title
+        return self.difficulty
     
 
 class AlgorithmTest(models.Model):
-    language = models.ForeignKey(Problem, on_delete=models.CASCADE)
+    advanced_test = models.ForeignKey(AdvancedTest, on_delete=models.CASCADE)
+    language = models.ForeignKey(Language, on_delete=models.CASCADE)
     problem = models.ForeignKey(Problem, related_name="test_cases", on_delete=models.CASCADE)
     algorithm = models.TextField()  # tugri kod kod
     algorithmtest = models.TextField()  # To'g'ri kod
@@ -69,7 +78,7 @@ class TestCase(models.Model):
     output_data = models.CharField(max_length=200)
 
     def __str__(self):
-        return f"Test for {self.problem.title}"
+        return f"Test for {self.algorithm.language.name}"
 
 
 
