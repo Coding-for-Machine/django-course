@@ -1,9 +1,9 @@
-from django.contrib.auth.models import User
 from django.db import models
-from users.models import MyUser
-from courses.models import Module
 from django_ckeditor_5.fields import CKEditor5Field
 
+class SomeModel(models.Model):
+    def get_module(self):
+        from courses.models import Module
 
 class Language(models.Model):
     name = models.CharField(max_length=250)
@@ -12,14 +12,14 @@ class Language(models.Model):
     def __str__(self):
         return self.name
     
-class AdvancedTest(models.Model):
-    code = models.TextField()
-    def __str__(self):
-        return f"{self.id}---AdvancedTest"
+# class AdvancedTest(models.Model):
+#     code = models.TextField()
+#     def __str__(self):
+#         return f"{self.id}---AdvancedTest"
     
 # Dars modeli - har bir modulga tegishli darslarni saqlash uchun
 class Lesson(models.Model):
-    module = models.ForeignKey(Module, related_name='lessons', on_delete=models.CASCADE)  # Modulga bog'lanadi
+    module = models.ForeignKey(SomeModel, on_delete=models.CASCADE)  # Modulga bog'lanadi
     title = models.CharField(max_length=255)  # Dars nomi
     slug = models.SlugField(unique=True)  # Dars uchun noyob identifikator
     lesson_type = models.CharField(
@@ -52,7 +52,6 @@ class Problem(models.Model):
         ('hard', 'Hard'),
     ]
     difficulty = models.CharField(choices=difficulty_choices, max_length=6)
-    # Bu muammo uchun testlar va kod bo'limlari uchun qo'shimcha maydonlar bo'lishi mumkin.
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -63,17 +62,15 @@ class Problem(models.Model):
     
 
 class AlgorithmTest(models.Model):
-    advanced_test = models.ForeignKey(AdvancedTest, on_delete=models.CASCADE)
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
     problem = models.ForeignKey(Problem, related_name="test_cases", on_delete=models.CASCADE)
     algorithm = models.TextField()  # tugri kod kod
-    algorithmtest = models.TextField()  # To'g'ri kod
 
     def __str__(self):
         return self.algorithm[:30]
     
 class TestCase(models.Model):
-    algorithm = models.ForeignKey(AlgorithmTest, related_name="test_cases", on_delete=models.CASCADE)
+    algorithm = models.ForeignKey(AlgorithmTest, related_name="test_algorith", on_delete=models.CASCADE)
     input_data = models.CharField(max_length=200)
     output_data = models.CharField(max_length=200)
 
@@ -82,19 +79,3 @@ class TestCase(models.Model):
 
 
 
-class Submission(models.Model):
-    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
-    problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
-    code = models.TextField()  # Foydalanuvchi yuborgan kod
-    status_choices = [
-        ('pending', 'Pending'),
-        ('correct', 'Correct'),
-        ('incorrect', 'Incorrect'),
-        ('error', 'Error'),
-    ]
-    status = models.CharField(choices=status_choices, default='pending', max_length=10)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"Submission by {self.user.username} for {self.problem.title}"

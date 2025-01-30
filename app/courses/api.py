@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from lessons.models import Lesson
 from .models import Course, Enrollment, Module
 from .schemas import CourseSchema, CoursesListResponse
-from django.db.models import Prefetch
+
 
 api = NinjaAPI()
 
@@ -60,12 +60,8 @@ def get_courses(request):
 
 @api.get("/courses/{slug}", response={200: dict, 404: str})
 def get_course_by_slug(request, slug: str):
-    # Fetch the specific course by slug
     course = get_object_or_404(Course, slug=slug)
-    
-    # User-related logic for enrolled courses
     user_id = request.user.id if request.user.is_authenticated else None
-
     model = []
     if user_id:
         # Fetch the courses the user is enrolled in

@@ -1,17 +1,12 @@
 import os
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-dtqls^u%s0*-+#x5w94d9qveq$f)jjap$ep$tzfstd#k9ps$5#'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = True
 
 ALLOWED_HOSTS = []
@@ -26,12 +21,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'courses',
-    'lessons',
+    'courses.apps.CoursesConfig',
+    'lessons.apps.LessonsConfig',
     'users.apps.UsersConfig',
-    'savollar',
-    'django_ckeditor_5',
+    'userstatus.apps.UserstatusConfig',
+    'savollar.apps.SavollarConfig',
+    'comments.apps.CommentsConfig',
 
+    'django_ckeditor_5',
 ]
 
 AUTH_USER_MODEL = "users.MyUser"
@@ -113,14 +110,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 customColorPalette = [

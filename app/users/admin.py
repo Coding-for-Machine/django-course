@@ -1,11 +1,8 @@
 from django.contrib import admin
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 from django.utils.html import format_html
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import MyUser, Profile
 from savollar.models import Results
-from lessons.models import Submission
 
 
 @admin.register(MyUser)
@@ -36,4 +33,3 @@ class ProfileAdmin(admin.ModelAdmin):
 admin.site.register(Profile, ProfileAdmin)
 
 admin.site.register(Results)
-admin.site.register(Submission)

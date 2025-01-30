@@ -1,5 +1,4 @@
 from django.db import models
-
 from users.models import MyUser
 # Kurs modeli - kurslar haqida asosiy ma'lumotlarni saqlash uchun
 
@@ -53,7 +52,7 @@ class Payment(models.Model):
 
 # Modul modeli - har bir kursga tegishli bo'lgan modullarni saqlash uchun
 class Module(models.Model):
-    course = models.ForeignKey(Course, related_name='modules', on_delete=models.CASCADE)  # Kursga bog'lanadi
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)  # Kursga bog'lanadi
     title = models.CharField(max_length=255)  # Modul nomi
     slug = models.SlugField(unique=True)  # Modul uchun noyob identifikator
     description = models.TextField(blank=True, null=True)  # Modul tavsifi (ixtiyoriy)
