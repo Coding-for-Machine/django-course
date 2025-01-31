@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Course, Enrollment, Payment, Module
 from django.utils.text import slugify
+from django.db.models import Count
 
 # Course Admin
 class CourseAdmin(admin.ModelAdmin):
@@ -15,9 +16,13 @@ class CourseAdmin(admin.ModelAdmin):
         """
         if not obj.slug:
             obj.slug = slugify(obj.title)  # Slugni `title` asosida yaratish
+
         if not obj.lesson_count:
-            obj.lesson_count = obj.modules.aggregate(models.Count('lessons'))['lessons__count']
-        obj.save()
+            # Modullarni va darslarni hisoblash
+            lesson_count = sum(module.lessons.count() for module in obj.modules.all())
+            obj.lesson_count = lesson_count
+        
+        super().save_model(request, obj, form, change)
 
 admin.site.register(Course, CourseAdmin)
 

@@ -1,6 +1,5 @@
 from django.db import models
 from users.models import MyUser
-# Kurs modeli - kurslar haqida asosiy ma'lumotlarni saqlash uchun
 
 class Course(models.Model):
     title = models.CharField(max_length=255)
@@ -20,9 +19,9 @@ class Course(models.Model):
         Kursni saqlashdan oldin, ushbu kursga tegishli darslar sonini hisoblab,
         'lesson_count' maydonini yangilash.
         """
-        # Kursda biror modul mavjud bo'lsa, darslar sonini hisoblash
+        # Kursda modullar va darslar sonini hisoblash
         if self.pk:  # Agar primary key mavjud bo'lsa
-            self.lesson_count = self.modules.aggregate(models.Count('lessons'))['lessons__count']
+            self.lesson_count = sum(module.lessons.count() for module in self.modules.all())
         super().save(*args, **kwargs)  # Asl saqlashni amalga oshirish
 
 

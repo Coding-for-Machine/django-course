@@ -3,10 +3,9 @@ from django.contrib.contenttypes.models import ContentType
 from savollar.models import Question, Quiz
 from users.models import MyUser
 from lessons.models import Problem
-
-from django.db import models
-from users.models import MyUser
 from lessons.models import Problem, Language
+from users.models import MyUser
+
 
 
 # Foydalanuvchining yechimi
