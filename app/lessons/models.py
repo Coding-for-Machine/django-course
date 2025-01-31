@@ -1,9 +1,16 @@
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
+import random
+import string
 
 class SomeModel(models.Model):
     def get_module(self):
         from courses.models import Module
+
+def generate_slug_with_case(length=8):
+    characters = string.ascii_lowercase + string.ascii_uppercase + string.digits
+    slug = ''.join(random.choice(characters) for _ in range(length))
+    return slug
 
 class Language(models.Model):
     name = models.CharField(max_length=250)
@@ -11,11 +18,11 @@ class Language(models.Model):
 
     def __str__(self):
         return self.name
-    
-# class AdvancedTest(models.Model):
-#     code = models.TextField()
-#     def __str__(self):
-#         return f"{self.id}---AdvancedTest"
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = generate_slug_with_case(30)  # 10 uzunlikda tasodifiy slug yaratish
+        super().save(*args, **kwargs)
+
     
 # Dars modeli - har bir modulga tegishli darslarni saqlash uchun
 class Lesson(models.Model):
@@ -35,6 +42,11 @@ class Lesson(models.Model):
 
     def __str__(self):
         return f"Lesson: (Module: {self.module.title})"  # Dars nomi va tegishli modul nomini ko'rsatish
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = generate_slug_with_case(30)  # 10 uzunlikda tasodifiy slug yaratish
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ['created_at']  # Darslar yaratish vaqtiga ko'ra tartiblanadi
@@ -59,13 +71,26 @@ class Problem(models.Model):
         if self.title:
             return self.title
         return self.difficulty
-    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = generate_slug_with_case(30)  # 10 uzunlikda tasodifiy slug yaratish
+        super().save(*args, **kwargs)
+
+class Function(models.Model):
+    language = models.ForeignKey(Language, on_delete=models.CASCADE)
+    problem = models.ForeignKey(Problem, related_name="test_cases", on_delete=models.CASCADE)
+    function = models.TextField() 
+    created_at = models.DateTimeField(auto_now_add=True)  # Dars yaratish vaqti
+    updated_at = models.DateTimeField(auto_now=True)  # Dars yangilanish vaqti
+    def __str__(self):
+        return self.function[:30]
 
 class AlgorithmTest(models.Model):
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
     problem = models.ForeignKey(Problem, related_name="test_cases", on_delete=models.CASCADE)
     algorithm = models.TextField()  # tugri kod kod
-
+    created_at = models.DateTimeField(auto_now_add=True)  # Dars yaratish vaqti
+    updated_at = models.DateTimeField(auto_now=True)  # Dars yangilanish vaqti
     def __str__(self):
         return self.algorithm[:30]
     

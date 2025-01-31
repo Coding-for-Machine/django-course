@@ -1,8 +1,8 @@
 from django.db import models
 from django.utils import timezone
 from users.models import MyUser  # Foydalanuvchi modeli
-from lessons.models import Lesson, Problem, AlgorithmTest
-
+from lessons.models import Lesson, Problem
+from solution.models import Solution, UserQuizResult
 
 # ==========================
 # 1. UserActivity modeli - Foydalanuvchi faoliyatini saqlash
@@ -22,7 +22,7 @@ class UserActivityDaily(models.Model):
         verbose_name_plural = "User Daily Activities"
 
     def __str__(self):
-        return f"{self.user.username} - {self.date}: {self.activity_count} actions, {self.score} points"
+        return f"{self.user.email} - {self.date}: {self.activity_count} actions, {self.score} points"
 
     @classmethod
     def log_activity(cls, user, activity_count=1, duration=0, score=0):
@@ -50,7 +50,7 @@ class UserBadge(models.Model):
     date_earned = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.badge.name}"
+        return f"{self.user.email} - {self.badge.name}"
 
 class UserActivitySummary(models.Model):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
@@ -67,7 +67,7 @@ class UserActivitySummary(models.Model):
         unique_together = ('user', 'period_type', 'period_start')
 
     def __str__(self):
-        return f"{self.user.username} - {self.period_type}: {self.total_score} points"
+        return f"{self.user.email} - {self.period_type}: {self.total_score} points"
 
 class UserLeaderboard(models.Model):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
@@ -76,13 +76,15 @@ class UserLeaderboard(models.Model):
 
     @classmethod
     def update_leaderboard(cls):
+        """Foydalanuvchilar reytingini yangilash"""
         users = MyUser.objects.all()
         for user in users:
+            quiz_score = UserQuizResult.objects.filter(user=user).aggregate(models.Sum('score'))['score__sum'] or 0
             activity_score = UserActivityDaily.objects.filter(user=user).aggregate(models.Sum('score'))['score__sum'] or 0
             problem_score = UserProblemStatus.objects.filter(user=user).aggregate(models.Sum('score'))['score__sum'] or 0
-            test_score = UserAlgorithmTestStatus.objects.filter(user=user).aggregate(models.Sum('score'))['score__sum'] or 0
+            solution_score = Solution.objects.filter(user=user).aggregate(models.Sum('score'))['score__sum'] or 0  # ✅ Solution ballari qo'shildi
 
-            total_score = activity_score + problem_score + test_score
+            total_score = quiz_score + activity_score + problem_score + solution_score
             leaderboard, created = cls.objects.get_or_create(user=user)
             leaderboard.total_score = total_score
             leaderboard.save()
@@ -98,7 +100,7 @@ class UserLessonStatus(models.Model):
     progress = models.PositiveIntegerField(default=0)  # Darsdagi progress (foizlarda)
 
     def __str__(self):
-        return f"User: {self.user.username}, Lesson: {self.lesson.title}, Completed: {self.is_completed}"
+        return f"User: {self.user.email}, Lesson: {self.lesson.title}, Completed: {self.is_completed}"
 
     def update_progress(self, completed_parts, total_parts):
         """Darsdagi progressni aniq hisoblash"""
@@ -118,7 +120,7 @@ class UserProblemStatus(models.Model):
     score = models.PositiveIntegerField(default=0)  # Ball
 
     def __str__(self):
-        return f"User: {self.user.username}, Problem: {self.problem.title}, Completed: {self.is_completed}"
+        return f"User: {self.user.email}, Problem: {self.problem.title}, Completed: {self.is_completed}"
 
     def update_score(self, difficulty_level=1):
         """Muammo yechimi uchun ballni yangilash"""
@@ -129,23 +131,4 @@ class UserProblemStatus(models.Model):
         self.save()
 
 
-# ==========================
-# 4. UserAlgorithmTestStatus modeli - Algoritm testining statusi
-# ==========================
-class UserAlgorithmTestStatus(models.Model):
-    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
-    algorithm_test = models.ForeignKey(AlgorithmTest, on_delete=models.CASCADE)
-    is_completed = models.BooleanField(default=False)  # Test tugallandimi?
-    score = models.PositiveIntegerField(default=0)  # Ball
 
-    def __str__(self):
-        return f"User: {self.user.username}, AlgorithmTest: {self.algorithm_test.algorithm[:30]}, Completed: {self.is_completed}"
-
-    def update_score(self):
-        """Algoritm testining ballini yangilash"""
-        if self.is_completed:
-            # Ballni hisoblash, masalan, test to'g'ri bajarilsa
-            self.score = 100  # Testni to'g'ri yechgan foydalanuvchiga 100 ball
-        else:
-            self.score = 0
-        self.save()
