@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import MyUser, Profile
-from savollar.models import Results
 
 
 @admin.register(MyUser)
@@ -31,5 +30,3 @@ class ProfileAdmin(admin.ModelAdmin):
         return format_html('<i class="fa-regular fa-address-card"></i>')  # Iconni qo‘shish
     profile_icon.short_description = 'Profile-Icon'
 admin.site.register(Profile, ProfileAdmin)
-
-admin.site.register(Results)

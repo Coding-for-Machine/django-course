@@ -5,7 +5,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django_ckeditor_5.fields import CKEditor5Field
 from users.models import MyUser
-from courses.models import Module
+from courses.models import MyModules
 
 
 # Unikal slug yaratish funksiyasi
@@ -23,7 +23,7 @@ class Quiz(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
     description = CKEditor5Field(verbose_name='Savol', config_name='extends')
-    module = models.ForeignKey(Module, related_name='quizzes', on_delete=models.CASCADE)
+    MyModules = models.ForeignKey(MyModules, related_name='quizzes', on_delete=models.CASCADE)
     time_limit = models.PositiveIntegerField(default=10)  # daqiqalarda
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -4,6 +4,8 @@ from django.contrib.contenttypes.models import ContentType
 from lessons.models import Lesson
 from .models import Quiz, Question, Answer
 
+
+
 # ==============================
 # 1️⃣ Question Form (Dynamic object_id selection)
 # ==============================
@@ -39,7 +41,7 @@ class QuestionForm(forms.ModelForm):
 # ==============================
 class AnswerInline(admin.TabularInline):
     model = Answer
-    extra = 3  # 3 ta qo'shimcha bo'sh javob variantlarini ko'rsatadi
+    extra = 1  # 3 ta qo'shimcha bo'sh javob variantlarini ko'rsatadi
     min_num = 1
     fields = ('description', 'is_correct')
 
@@ -48,8 +50,8 @@ class AnswerInline(admin.TabularInline):
 # ==============================
 @admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ('title', 'slug', 'category', 'time_limit', 'is_active', 'created_at')
-    list_filter = ('category', 'is_active')
+    list_display = ('title', 'slug', 'time_limit', 'is_active', 'created_at')
+    list_filter = ('title', 'is_active')
     prepopulated_fields = {'slug': ('title',)}  # Slugni avtomatik generatsiya qilish
     search_fields = ('title', 'description')
     ordering = ('-created_at',)

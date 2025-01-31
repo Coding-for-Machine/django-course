@@ -1,6 +1,6 @@
 from django.contrib.admin import TabularInline
 from django.contrib import admin
-from .models import Language, Lesson, Problem, Function, AlgorithmTest, TestCase, SomeModel
+from .models import Language, Lesson, Problem, Function, AlgorithmTest, TestCase
 from django.utils.html import format_html
 
 
@@ -59,10 +59,6 @@ admin.site.register(AlgorithmTest, AlgorithmTestAdmin)
 
 
 
-# SomeModel Admin (for module)
-class SomeModelAdmin(admin.ModelAdmin):
-    list_display = ('get_module',)
-    search_fields = ('get_module',)
 
-admin.site.register(SomeModel, SomeModelAdmin)
+
 

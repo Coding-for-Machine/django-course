@@ -2,10 +2,7 @@ from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
 import random
 import string
-
-class SomeModel(models.Model):
-    def get_module(self):
-        from courses.models import Module
+from courses.models import MyModules
 
 def generate_slug_with_case(length=8):
     characters = string.ascii_lowercase + string.ascii_uppercase + string.digits
@@ -26,7 +23,7 @@ class Language(models.Model):
     
 # Dars modeli - har bir modulga tegishli darslarni saqlash uchun
 class Lesson(models.Model):
-    module = models.ForeignKey(SomeModel, on_delete=models.CASCADE)  # Modulga bog'lanadi
+    module = models.ForeignKey(MyModules, on_delete=models.CASCADE)  # Modulga bog'lanadi
     title = models.CharField(max_length=255)  # Dars nomi
     slug = models.SlugField(unique=True)  # Dars uchun noyob identifikator
     lesson_type = models.CharField(
@@ -78,7 +75,7 @@ class Problem(models.Model):
 
 class Function(models.Model):
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
-    problem = models.ForeignKey(Problem, related_name="test_cases", on_delete=models.CASCADE)
+    problem = models.ForeignKey(Problem, related_name="functions", on_delete=models.CASCADE)
     function = models.TextField() 
     created_at = models.DateTimeField(auto_now_add=True)  # Dars yaratish vaqti
     updated_at = models.DateTimeField(auto_now=True)  # Dars yangilanish vaqti

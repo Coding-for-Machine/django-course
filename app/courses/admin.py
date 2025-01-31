@@ -1,28 +1,27 @@
 from django.contrib import admin
-from .models import Course, Enrollment, Payment, Module
+from .models import Course, Enrollment, Payment, MyModules
 from django.utils.text import slugify
-from django.db.models import Count
 
 # Course Admin
 class CourseAdmin(admin.ModelAdmin):
     list_display = ('title', 'slug', 'price', 'lesson_count', 'unlisted', 'created_at', 'updated_at')
     search_fields = ('title', 'slug')
-    list_filter = ('unlisted',)  # Filtrlar qo'shish
-    prepopulated_fields = {'slug': ('title',)}  # Slugni avtomatik yaratish
+    list_filter = ('unlisted',)
+    prepopulated_fields = {'slug': ('title',)}
 
     def save_model(self, request, obj, form, change):
         """
         Kursni saqlashdan oldin slugni sozlash va lesson_count ni hisoblash.
         """
         if not obj.slug:
-            obj.slug = slugify(obj.title)  # Slugni `title` asosida yaratish
+            obj.slug = slugify(obj.title)
 
-        if not obj.lesson_count:
-            # Modullarni va darslarni hisoblash
-            lesson_count = sum(module.lessons.count() for module in obj.modules.all())
-            obj.lesson_count = lesson_count
+        super().save_model(request, obj, form, change)  # Avval kursni saqlaymiz
+
+        # Modullarni va darslarni hisoblash
+        obj.lesson_count = sum(module.lessons.count() for module in obj.modules.all())
         
-        super().save_model(request, obj, form, change)
+        super().save_model(request, obj, form, change)  # Yana saqlaymiz, lesson_count yangilanishi uchun
 
 admin.site.register(Course, CourseAdmin)
 
@@ -50,14 +49,15 @@ class ModuleAdmin(admin.ModelAdmin):
     list_display = ('title', 'course', 'slug', 'created_at', 'updated_at')
     search_fields = ('title', 'course__title', 'slug')
     list_filter = ('course',)
-    prepopulated_fields = {'slug': ('title',)}  # Slugni avtomatik yaratish
+    prepopulated_fields = {'slug': ('title',)}
 
     def save_model(self, request, obj, form, change):
         """
         Modulni saqlashdan oldin slugni sozlash.
         """
         if not obj.slug:
-            obj.slug = slugify(obj.title)  # Slugni `title` asosida yaratish
-        obj.save()
+            obj.slug = slugify(obj.title)
+        
+        super().save_model(request, obj, form, change)  # Avval modulni saqlaymiz
 
-admin.site.register(Module, ModuleAdmin)
+admin.site.register(MyModules, ModuleAdmin)

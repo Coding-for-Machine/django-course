@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'savollar.apps.SavollarConfig',
     'comments.apps.CommentsConfig',
     'solution.apps.SolutionConfig',
+    'Certificate.apps.CertificateConfig',
 
     'django_ckeditor_5',
 ]

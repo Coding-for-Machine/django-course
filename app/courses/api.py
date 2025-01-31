@@ -2,7 +2,7 @@ from ninja import NinjaAPI
 from django.shortcuts import get_object_or_404
 
 from lessons.models import Lesson
-from .models import Course, Enrollment, Module
+from .models import Course, Enrollment, MyModules
 from .schemas import CourseSchema, CoursesListResponse
 
 
@@ -72,7 +72,7 @@ def get_course_by_slug(request, slug: str):
     enrolled = course in model
     
     # Fetch the related modules and lessons for the course
-    modules = Module.objects.filter(course=course)
+    modules = MyModules.objects.filter(course=course)
     
     course_data = {
         "slug": course.slug,

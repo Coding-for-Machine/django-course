@@ -4,7 +4,7 @@ from ninja import Router
 
 from .problems_schemas import ProblemSchema
 from .models import AlgorithmTest, Lesson, Problem, TestCase
-from savollar.models import Savol, Varyant
+from savollar.models import Question, Answer
 
 problems_api = Router()
 
@@ -56,10 +56,10 @@ def problems_dateal(request, slug_lesson, slug):
                                     "created": varyant.created,
                                     "updated": varyant.updated,
                                 }
-                                for varyant in Varyant.objects.filter(savol=savol)
+                                for varyant in Answer.objects.filter(savol=savol)
                             ],
                         }
-                        for savol in Savol.objects.filter(problems=problem)
+                        for savol in Question.objects.filter(problems=problem)
                     ],
                 }
                 for problem in problems
