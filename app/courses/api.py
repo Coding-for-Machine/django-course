@@ -1,4 +1,4 @@
-from ninja import NinjaAPI
+from ninja import Router
 from django.shortcuts import get_object_or_404
 
 from lessons.models import Lesson
@@ -6,10 +6,11 @@ from .models import Course, Enrollment, MyModules
 from .schemas import CourseSchema, CoursesListResponse
 
 
-api = NinjaAPI()
+api_course= Router()
+
 
 # Kurslar ro'yxatini olish va JSON formatda qaytarish
-@api.get("/courses/", response=CoursesListResponse)
+@api_course.get("/courses/", response=CoursesListResponse)
 def get_courses(request):
     # Foydalanuvchining ID raqamini olish
     user_id = request.user.id if request.user.is_authenticated else None
@@ -58,7 +59,7 @@ def get_courses(request):
     }
 
 
-@api.get("/courses/{slug}", response={200: dict, 404: str})
+@api_course.get("/courses/{slug}", response={200: dict, 404: str})
 def get_course_by_slug(request, slug: str):
     course = get_object_or_404(Course, slug=slug)
     user_id = request.user.id if request.user.is_authenticated else None

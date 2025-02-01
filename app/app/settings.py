@@ -1,3 +1,4 @@
+from datetime import timedelta
 import os
 from pathlib import Path
 
@@ -31,6 +32,8 @@ INSTALLED_APPS = [
     'Certificate.apps.CertificateConfig',
 
     'django_ckeditor_5',
+    'ninja_jwt',
+    'ninja_extra',
 ]
 
 AUTH_USER_MODEL = "users.MyUser"
@@ -44,6 +47,15 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
+# JWT sozlamalari
+NINJA_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),  # 1 kun amal qiladi
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7), # 7 kun amal qiladi
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+}
 
 ROOT_URLCONF = 'app.urls'
 
