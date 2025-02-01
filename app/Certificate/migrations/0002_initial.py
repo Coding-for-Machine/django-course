@@ -9,14 +9,14 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('comments', '0001_initial'),
-        ('lessons', '0001_initial'),
+        ('Certificate', '0001_initial'),
+        ('courses', '0001_initial'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='comments',
-            name='problems',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='lessons.problem'),
+            model_name='certificate',
+            name='course',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='courses.course'),
         ),
     ]
