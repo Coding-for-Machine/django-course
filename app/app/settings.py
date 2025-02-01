@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #  my apps
     'courses.apps.CoursesConfig',
     'lessons.apps.LessonsConfig',
     'users.apps.UsersConfig',
@@ -57,6 +58,19 @@ NINJA_JWT = {
     "SIGNING_KEY": SECRET_KEY,
 }
 
+#  ---------------------------------
+#  Redis Cache
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",  # Redis serverga ulanish
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",  # Redis bilan ishlash uchun
+        }
+    }
+}
+
+#  ---------------------------------
 ROOT_URLCONF = 'app.urls'
 
 TEMPLATES = [

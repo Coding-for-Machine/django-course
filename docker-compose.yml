@@ -2,11 +2,11 @@ version: '3'
 services:
   # PostgreSQL
   db:
-    image: postgres:13
+    image: postgres:latest
     environment:
-      POSTGRES_DB: mydb
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: asadbek20020107
+      POSTGRES_USER: asadbek20020107
+      POSTGRES_PASSWORD: asadbek20020107
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
