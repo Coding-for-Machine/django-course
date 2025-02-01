@@ -1,0 +1,42 @@
+version: '3'
+services:
+  # PostgreSQL
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+  # Redis
+  redis:
+    image: redis:latest
+    networks:
+      - app_network
+
+  # Django web server
+  web:
+    build: ./app/Dockerfile
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - app_network
+    environment:
+      DJANGO_ENV: development  # Bu yerda `development` yoki `production` muhitini tanlashingiz mumkin
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
