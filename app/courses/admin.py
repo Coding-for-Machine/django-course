@@ -19,7 +19,7 @@ class CourseAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)  # Avval kursni saqlaymiz
 
         # Modullarni va darslarni hisoblash
-        obj.lesson_count = sum(module.lessons.count() for module in obj.modules.all())
+        obj.lesson_count = sum(module.lesson.count() for module in obj.modules.all())
         
         super().save_model(request, obj, form, change)  # Yana saqlaymiz, lesson_count yangilanishi uchun
 

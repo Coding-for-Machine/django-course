@@ -1,29 +1,40 @@
 from ninja import Router
+from django_redis import get_redis_connection
 from django.shortcuts import get_object_or_404
+from django.http import HttpRequest
+import json
 
 from lessons.models import Lesson
 from .models import Course, Enrollment, MyModules
-from .schemas import CourseSchema, CoursesListResponse
+from .schemas import CoursesListResponse
 
-
-api_course= Router()
+api_course = Router()
 
 
 # Kurslar ro'yxatini olish va JSON formatda qaytarish
 @api_course.get("/courses/", response=CoursesListResponse)
-def get_courses(request):
-    # Foydalanuvchining ID raqamini olish
+def get_courses(request: HttpRequest):
+    redis_conn = get_redis_connection("default")  # Redis ulanishini olish
+    user_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown_ip'))
+    cache_key = f"user_courses_cache_{user_ip}"  # Har bir foydalanuvchi uchun alohida cache
+
+    # Redis cache'ni tekshiramiz
+    cached_data = redis_conn.get(cache_key)
+    if cached_data:
+        return json.loads(cached_data)  # Agar cache mavjud bo‘lsa, JSON qilib qaytaramiz
+
+    # Foydalanuvchi ID sini olish
     user_id = request.user.id if request.user.is_authenticated else None
     courses = Course.objects.all()
 
     enrolled_courses = []
 
-    # Foydalanuvchining kursga ro'yxatdan o'tgan kurslarini olish
+    # Foydalanuvchining kursga yozilganlarini olish
     if user_id:
         enrollments = Enrollment.objects.filter(user_id=user_id)
         enrolled_courses = [enrollment.course for enrollment in enrollments]
 
-    # Course ro'yxatini yaratish
+    # Ro'yxatdan o'tmagan kurslar
     all_courses = [
         {
             "title": course.title,
@@ -35,10 +46,10 @@ def get_courses(request):
             "trailer": course.trailer,
             "unlisted": course.unlisted
         }
-        for course in courses if course not in enrolled_courses  # Only include courses the user is not enrolled in
+        for course in courses if course not in enrolled_courses
     ]
 
-    # Enrolled course list for authenticated user
+    # Ro‘yxatdan o‘tgan kurslar
     enrolled = [
         {
             "title": course.title,
@@ -53,28 +64,38 @@ def get_courses(request):
         for course in enrolled_courses
     ]
 
-    return {
-        "all": all_courses,  # All courses excluding the ones user is enrolled in
-        "enrolled": enrolled,  # Enrolled courses for the authenticated user
+    response_data = {
+        "all": all_courses,  
+        "enrolled": enrolled,  
     }
+
+    # Redis'ga 5 daqiqaga cache saqlash
+    redis_conn.setex(cache_key, 300, json.dumps(response_data))
+
+    return response_data
 
 
 @api_course.get("/courses/{slug}", response={200: dict, 404: str})
-def get_course_by_slug(request, slug: str):
+def get_course_by_slug(request: HttpRequest, slug: str):
+    redis_conn = get_redis_connection("default")
+    user_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown_ip'))
+    cache_key = f"user_course_detail_cache_{user_ip}_{slug}"  # IP va kurs slug'iga ko‘ra cache
+
+    cached_data = redis_conn.get(cache_key)
+    if cached_data:
+        return json.loads(cached_data)
+
     course = get_object_or_404(Course, slug=slug)
     user_id = request.user.id if request.user.is_authenticated else None
-    model = []
-    if user_id:
-        # Fetch the courses the user is enrolled in
-        enrollments = Enrollment.objects.filter(user_id=user_id)
-        model = [enrollment.course for enrollment in enrollments]
+    enrolled_courses = []
 
-    # Check if the user is enrolled in this course
-    enrolled = course in model
-    
-    # Fetch the related modules and lessons for the course
+    if user_id:
+        enrollments = Enrollment.objects.filter(user_id=user_id)
+        enrolled_courses = [enrollment.course for enrollment in enrollments]
+
+    enrolled = course in enrolled_courses
     modules = MyModules.objects.filter(course=course)
-    
+
     course_data = {
         "slug": course.slug,
         "title": course.title,
@@ -101,8 +122,11 @@ def get_course_by_slug(request, slug: str):
             }
             for module in modules
         ],
-        "enrolled": enrolled,  # If the user is enrolled in this course
-        "group_link": None  # Adjust as necessary
+        "enrolled": enrolled,
+        "group_link": None  
     }
+
+    # Redis'ga 5 daqiqaga cache qilish
+    redis_conn.setex(cache_key, 300, json.dumps(course_data))
 
     return course_data

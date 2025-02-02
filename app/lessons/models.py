@@ -23,7 +23,7 @@ class Language(models.Model):
     
 # Dars modeli - har bir modulga tegishli darslarni saqlash uchun
 class Lesson(models.Model):
-    module = models.ForeignKey(MyModules, on_delete=models.CASCADE)  # Modulga bog'lanadi
+    module = models.ForeignKey(MyModules, related_name="lesson", on_delete=models.CASCADE)  # Modulga bog'lanadi
     title = models.CharField(max_length=255)  # Dars nomi
     slug = models.SlugField(unique=True)  # Dars uchun noyob identifikator
     lesson_type = models.CharField(

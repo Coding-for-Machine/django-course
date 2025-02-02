@@ -28,7 +28,7 @@ class Course(models.Model):
         
         # Agar kurs avvaldan mavjud bo‘lsa, unga bog‘langan modullarni hisoblash
         if not is_new:
-            self.lesson_count = sum(module.lessons.count() for module in self.modules.all())  # "module_set" emas, "modules"
+            self.lesson_count = sum(module.lesson.all().count() for module in self.modules.all())  # "module_set" emas, "modules"
             super().save(update_fields=['lesson_count'])  # Faqat lesson_count yangilanadi
 
 
