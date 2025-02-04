@@ -5,6 +5,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django_ckeditor_5.fields import CKEditor5Field
 from users.models import MyUser
+from django.utils.text import slugify
 from courses.models import MyModules
 
 
@@ -42,9 +43,6 @@ class Quiz(models.Model):
     def __str__(self):
         return self.title
 
-from django.db import models
-from django.utils.text import slugify
-from django.utils.timezone import now
 
 def generate_unique_slug(model_class, title):
     """Berilgan sarlavha bo‘yicha unikal slug yaratish"""
@@ -150,5 +148,5 @@ class Answer(models.Model):
         verbose_name_plural = "Answers"
 
     def __str__(self):
-        return f"{self.description} ({"✅ To'g'ri!" if self.is_correct else "❌ Xato varyat!"})"
+        return f"{self.description} ({" To'g'ri!" if self.is_correct else "Xato varyat!"})"
 
