@@ -14,65 +14,66 @@ api_course = Router()
 # Kurslar ro'yxatini olish va JSON formatda qaytarish
 @api_course.get("/courses/", response=CoursesListResponse)
 def get_courses(request: HttpRequest):
-    redis_conn = get_redis_connection("default")  # Redis ulanishini olish
-    user_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown_ip'))
-    cache_key = f"user_courses_cache_{user_ip}"  # Har bir foydalanuvchi uchun alohida cache
+    if not request.user.is_authenticated:
+        pass
+    else:
+        redis_conn = get_redis_connection("default")  # Redis ulanishini olish
+        user_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown_ip'))
+        cache_key = f"user_courses_cache_{user_ip}"  # Har bir foydalanuvchi uchun alohida cache
+        cached_data = redis_conn.get(cache_key)
+        if cached_data:
+            return json.loads(cached_data)  # Agar cache mavjud bo‘lsa, JSON qilib qaytaramiz
 
-    # Redis cache'ni tekshiramiz
-    cached_data = redis_conn.get(cache_key)
-    if cached_data:
-        return json.loads(cached_data)  # Agar cache mavjud bo‘lsa, JSON qilib qaytaramiz
+        # Foydalanuvchi ID sini olish
+        user_id = request.user.id if request.user.is_authenticated else None
+        courses = Course.objects.all()
 
-    # Foydalanuvchi ID sini olish
-    user_id = request.user.id if request.user.is_authenticated else None
-    courses = Course.objects.all()
+        enrolled_courses = []
 
-    enrolled_courses = []
+        # Foydalanuvchining kursga yozilganlarini olish
+        if user_id:
+            enrollments = Enrollment.objects.filter(user_id=user_id)
+            enrolled_courses = [enrollment.course for enrollment in enrollments]
 
-    # Foydalanuvchining kursga yozilganlarini olish
-    if user_id:
-        enrollments = Enrollment.objects.filter(user_id=user_id)
-        enrolled_courses = [enrollment.course for enrollment in enrollments]
+        # Ro'yxatdan o'tmagan kurslar
+        all_courses = [
+            {
+                "title": course.title,
+                "slug": course.slug,
+                "price": course.price,
+                "description": course.description,
+                "thumbnail": course.thumbnail,
+                "lesson_count": course.lesson_count if course.lesson_count is not None else 0,
+                "trailer": course.trailer,
+                "unlisted": course.unlisted
+            }
+            for course in courses if course not in enrolled_courses
+        ]
 
-    # Ro'yxatdan o'tmagan kurslar
-    all_courses = [
-        {
-            "title": course.title,
-            "slug": course.slug,
-            "price": course.price,
-            "description": course.description,
-            "thumbnail": course.thumbnail,
-            "lesson_count": course.lesson_count if course.lesson_count is not None else 0,
-            "trailer": course.trailer,
-            "unlisted": course.unlisted
+        # Ro‘yxatdan o‘tgan kurslar
+        enrolled = [
+            {
+                "title": course.title,
+                "slug": course.slug,
+                "price": course.price,
+                "description": course.description,
+                "thumbnail": course.thumbnail,
+                "lesson_count": course.lesson_count if course.lesson_count is not None else 0,
+                "trailer": course.trailer,
+                "unlisted": course.unlisted
+            }
+            for course in enrolled_courses
+        ]
+
+        response_data = {
+            "all": all_courses,  
+            "enrolled": enrolled,  
         }
-        for course in courses if course not in enrolled_courses
-    ]
 
-    # Ro‘yxatdan o‘tgan kurslar
-    enrolled = [
-        {
-            "title": course.title,
-            "slug": course.slug,
-            "price": course.price,
-            "description": course.description,
-            "thumbnail": course.thumbnail,
-            "lesson_count": course.lesson_count if course.lesson_count is not None else 0,
-            "trailer": course.trailer,
-            "unlisted": course.unlisted
-        }
-        for course in enrolled_courses
-    ]
+        # Redis'ga 5 daqiqaga cache saqlash
+        redis_conn.setex(cache_key, 300, json.dumps(response_data))
 
-    response_data = {
-        "all": all_courses,  
-        "enrolled": enrolled,  
-    }
-
-    # Redis'ga 5 daqiqaga cache saqlash
-    redis_conn.setex(cache_key, 300, json.dumps(response_data))
-
-    return response_data
+        return response_data
 
 
 @api_course.get("/courses/{slug}", response={200: dict, 404: str})

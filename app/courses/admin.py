@@ -29,7 +29,7 @@ admin.site.register(Course, CourseAdmin)
 # Enrollment Admin
 class EnrollmentAdmin(admin.ModelAdmin):
     list_display = ('user', 'course', 'enrolled_at', 'is_paid', 'created_at', 'updated_at')
-    search_fields = ('user__username', 'course__title')
+    search_fields = ('user__email', 'course__title')
     list_filter = ('is_paid',)
 
 admin.site.register(Enrollment, EnrollmentAdmin)
