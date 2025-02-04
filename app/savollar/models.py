@@ -148,5 +148,5 @@ class Answer(models.Model):
         verbose_name_plural = "Answers"
 
     def __str__(self):
-        return f"{self.description} ({str("To\'g\'ri!") if self.is_correct else str("Xato varyat!")})"
+        return f"{self.description}"
 
