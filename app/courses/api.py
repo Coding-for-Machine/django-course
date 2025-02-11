@@ -7,6 +7,8 @@ import json
 from lessons.models import Lesson
 from .models import Course, Enrollment, MyModules
 from .schemas import CoursesListResponse
+from userstatus.models import UserLessonStatus
+
 
 api_course = Router()
 
@@ -32,7 +34,7 @@ def get_courses(request: HttpRequest):
 
         # Foydalanuvchining kursga yozilganlarini olish
         if user_id:
-            enrollments = Enrollment.objects.filter(user_id=user_id)
+            enrollments = Enrollment.objects.filter(user_id=user_id, is_paid=True)
             enrolled_courses = [enrollment.course for enrollment in enrollments]
 
         # Ro'yxatdan o'tmagan kurslar
@@ -98,31 +100,40 @@ def get_course_by_slug(request: HttpRequest, slug: str):
     modules = MyModules.objects.filter(course=course)
 
     course_data = {
-        "slug": course.slug,
-        "title": course.title,
-        "price": course.price,
-        "description": course.description,
-        "trailer": course.trailer,
-        "thumbnail": course.thumbnail,
-        "lesson_count": course.lesson_count if course.lesson_count is not None else 0,
-        "modules": [
-            {
-                "slug": module.slug,
-                "title": module.title,
-                "description": module.description,
-                "lessons": [
-                    {
-                        "slug": lesson.slug,
-                        "title": lesson.title,
-                        "type": lesson.lesson_type,
-                        "locked": lesson.locked,
-                        "preview": lesson.preview,
-                    }
-                    for lesson in Lesson.objects.filter(module=module)
-                ]
-            }
-            for module in modules
-        ],
+        "courses_and_lesson": [{
+            "slug": course.slug,
+            "title": course.title,
+            "price": course.price,
+            "description": course.description,
+            "trailer": course.trailer,
+            "thumbnail": course.thumbnail,
+            "lesson_count": course.lesson_count if course.lesson_count is not None else 0,
+            "modules": [
+                {
+                    "slug": module.slug,
+                    "title": module.title,
+                    "description": module.description,
+                    "lessons": [{
+                            "slug": lesson.slug,
+                            "title": lesson.title,
+                            "type": lesson.lesson_type,
+                            "locked": lesson.locked,
+                            "preview": lesson.preview,
+                            "lesson_status": [
+                                {
+                                    "is_comlact": status.is_completed,
+                                    "progress": status.progress,
+                                }
+                                for status in UserLessonStatus.objects.filter(lesson=lesson, user=user_id)
+                            ]
+                        }
+                        for lesson in Lesson.objects.filter(module=module)
+                    ],
+                   
+                }
+                for module in modules
+            ],
+        }],
         "enrolled": enrolled,
         "group_link": None  
     }

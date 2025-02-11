@@ -32,7 +32,13 @@ class AlgorithmTestSchema(BaseModel):
 
     class Config:
         orm_mode = True
+class ProblemsUsersSatatus(BaseModel):
+    is_completed: bool
+    score: int
 
+    class Config:
+        orm_mode = True
+    
 # Problem Schema
 class ProblemSchema(BaseModel):
     id: int
@@ -43,6 +49,7 @@ class ProblemSchema(BaseModel):
     test_cases: List[AlgorithmTestSchema]  # Muammoga tegishli testlar
     created_at: datetime
     updated_at: datetime
+    problems_status: List[ProblemsUsersSatatus]
 
     class Config:
         orm_mode = True

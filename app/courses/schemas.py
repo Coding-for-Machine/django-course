@@ -22,6 +22,10 @@ class CoursesListResponse(BaseModel):
         orm_mode = True
 
 
+class LessonStatusSchima(BaseModel):
+    is_completed: bool
+    progress: str
+
 # Lesson Schema
 class LessonSchema(BaseModel):
     slug: str
@@ -29,10 +33,10 @@ class LessonSchema(BaseModel):
     type: str  # 'lecture' or 'lab'
     locked: bool
     preview: bool
+    lesson_status: List[LessonStatusSchima]
 
     class Config:
         orm_mode = True
-
 
 # Module Schema
 class ModuleSchema(BaseModel):

@@ -4,6 +4,7 @@ from users.models import MyUser  # Foydalanuvchi modeli
 from lessons.models import Lesson, Problem
 from solution.models import Solution, UserQuizResult
 
+
 # ==========================
 # 1. UserActivity modeli - Foydalanuvchi faoliyatini saqlash
 # ==========================
@@ -95,7 +96,7 @@ class UserLeaderboard(models.Model):
 # ==========================
 class UserLessonStatus(models.Model):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    lesson = models.ForeignKey(Lesson, related_name="lesson_status", on_delete=models.CASCADE)
     is_completed = models.BooleanField(default=False)  # Dars tugallandimi?
     progress = models.PositiveIntegerField(default=0)  # Darsdagi progress (foizlarda)
 

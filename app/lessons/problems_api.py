@@ -2,6 +2,8 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from ninja import Router
 
+from userstatus.models import UserProblemStatus
+
 from .problems_schemas import ProblemSchema
 from .models import Lesson, Problem, TestCase
 from savollar.models import Question, Answer
@@ -10,6 +12,9 @@ problems_api = Router()
 
 @problems_api.get("/{slug_lesson}/{slug}", response=ProblemSchema)
 def problems_dateal(request, slug_lesson, slug):
+    if not request.user.is_authenticated:
+        return {"message": "tizimga kiring?"}
+    user_id = request.user.id if request.user.is_authenticated else None
     lesson = get_object_or_404(Lesson, slug=slug_lesson)
     if lesson:
         problems = Problem.objects.filter(slug=slug)
@@ -25,7 +30,13 @@ def problems_dateal(request, slug_lesson, slug):
                     "difficulty": problem.difficulty,
                     "created_at": problem.created_at,
                     "updated_at": problem.updated_at,
-                    "test": [
+                    "problems_status": [{
+                        "is_completed": status.is_completed,
+                        "score": status.score
+                    }
+                    for status in UserProblemStatus.objects.filter(problems=problem, user=user_id)
+                    ],
+                    "question": [
                         {
                             "id": savol.id,
                             "description": savol.description,
