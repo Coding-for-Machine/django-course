@@ -1,6 +1,6 @@
 from django.contrib.admin import TabularInline
 from django.contrib import admin
-from .models import Language, Lesson, Problem, Function, AlgorithmTest, TestCase
+from .models import Language, Lesson, Problem, Function, TestCase
 from django.utils.html import format_html
 
 
@@ -23,6 +23,9 @@ class LessonAdmin(admin.ModelAdmin):
 
 admin.site.register(Lesson, LessonAdmin)
 
+class TestCaseInline(TabularInline):
+    model = TestCase
+    extra = 4  # Dastlabki yangi TestCase qo'shishni ko'rsatadi
 
 # Problem Admin
 class ProblemAdmin(admin.ModelAdmin):
@@ -30,8 +33,10 @@ class ProblemAdmin(admin.ModelAdmin):
     search_fields = ('title', 'lesson__title', 'difficulty')
     list_filter = ('difficulty', 'lesson')
     prepopulated_fields = {'slug': ('title',)}
+    inlines = [TestCaseInline]
 
 admin.site.register(Problem, ProblemAdmin)
+
 
 
 # Function Admin
@@ -41,24 +46,3 @@ class FunctionAdmin(admin.ModelAdmin):
     list_filter = ('language', 'problem')
 
 admin.site.register(Function, FunctionAdmin)
-
-
-
-class TestCaseInline(TabularInline):
-    model = TestCase
-    extra = 4  # Dastlabki yangi TestCase qo'shishni ko'rsatadi
-
-# AlgorithmTest modelini ro'yxatga olish va inline qo'shish
-class AlgorithmTestAdmin(admin.ModelAdmin):
-    list_display = ('language', 'problem', 'algorithm', 'created_at')
-    search_fields = ('language__name', 'problem__title', 'algorithm')
-    list_filter = ('language', 'problem')
-    inlines = [TestCaseInline]
-
-admin.site.register(AlgorithmTest, AlgorithmTestAdmin)
-
-
-
-
-
-

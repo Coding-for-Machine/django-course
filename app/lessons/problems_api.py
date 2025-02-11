@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from ninja import Router
 
 from .problems_schemas import ProblemSchema
-from .models import AlgorithmTest, Lesson, Problem, TestCase
+from .models import Lesson, Problem, TestCase
 from savollar.models import Question, Answer
 
 problems_api = Router()
@@ -25,22 +25,6 @@ def problems_dateal(request, slug_lesson, slug):
                     "difficulty": problem.difficulty,
                     "created_at": problem.created_at,
                     "updated_at": problem.updated_at,
-                    "algoritm": [
-                        {
-                            "language": algorithm_test.language.name,
-                            "algorithm": algorithm_test.algorithm,
-                            "algorithmtest": algorithm_test.algorithmtest,
-                            "advanced_test": algorithm_test.advanced_test.code,
-                            "test_cases": [
-                                {
-                                    "input_data": test_case.input_data,
-                                    "output_data": test_case.output_data
-                                }
-                                for test_case in TestCase.objects.filter(algorithm=algorithm_test)[:3]
-                            ]
-                        }
-                        for algorithm_test in AlgorithmTest.objects.filter(problem=problem)
-                    ],
                     "test": [
                         {
                             "id": savol.id,

@@ -1,3 +1,4 @@
+import os
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
 import random
@@ -82,22 +83,14 @@ class Function(models.Model):
     def __str__(self):
         return self.function[:30]
 
-class AlgorithmTest(models.Model):
-    language = models.ForeignKey(Language, on_delete=models.CASCADE)
-    problem = models.ForeignKey(Problem, related_name="test_cases", on_delete=models.CASCADE)
-    algorithm = models.TextField()  # tugri kod kod
-    created_at = models.DateTimeField(auto_now_add=True)  # Dars yaratish vaqti
-    updated_at = models.DateTimeField(auto_now=True)  # Dars yangilanish vaqti
-    def __str__(self):
-        return self.algorithm[:30]
-    
-class TestCase(models.Model):
-    algorithm = models.ForeignKey(AlgorithmTest, related_name="test_algorith", on_delete=models.CASCADE)
-    input_data = models.CharField(max_length=200)
-    output_data = models.CharField(max_length=200)
 
+class TestCase(models.Model):
+    problem = models.ForeignKey("Problem", related_name="test_algorith", on_delete=models.CASCADE)
+    input_data = models.CharField(max_length=200, help_text="Inputlar \\n bilan ajratilgan bo‘lishi kerak")
+    output_data = models.CharField(max_length=200, help_text="Output ma’lumotlari")
     def __str__(self):
-        return f"Test for {self.algorithm.language.name}"
+        return f"Test for {self.problem.title}"
+
 
 
 

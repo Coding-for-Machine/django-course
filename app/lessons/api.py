@@ -1,6 +1,6 @@
 from ninja import Router
 from django.shortcuts import get_object_or_404
-from .models import Lesson, Problem, AlgorithmTest, TestCase
+from .models import Lesson, Problem, TestCase
 from .schemas import LessonSchema  # LessonSchema Pydantic modelini import qilamiz
 from django.http import JsonResponse
 
@@ -31,22 +31,6 @@ def get_lesson_by_slug(request, slug: str):
                 "difficulty": problem.difficulty,
                 "created_at": problem.created_at,
                 "updated_at": problem.updated_at,
-                "algoritm": [
-                    {
-                        "algorithm": algorithm_test.algorithm,
-                        "algorithmtest": algorithm_test.algorithmtest,
-                        
-                        "test_cases": [
-                            {
-                                "input_data": test_case.input_data,
-                                "output_data": test_case.output_data
-                            }
-                            for test_case in TestCase.objects.filter(algorithm=algorithm_test)[:3]
-                        ]
-                    }
-
-                    for algorithm_test in AlgorithmTest.objects.filter(problem=problem)
-                ]
             }
             for problem in problems
         ]

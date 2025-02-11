@@ -4,30 +4,69 @@ from .models import Solution, UserQuizResult, UserQuestionResult
 from users.models import MyUser
 from lessons.models import Problem, Language
 from savollar.models import Quiz, Question
+from ninja import Router, Schema
 
 from .schemas import *
 
 solution_url_api = Router()
 
 
-# ✅ Solution yaratish (POST)
-@solution_url_api.post("/solutions", response=SolutionSchema)
-def create_solution(request, data: SolutionSchema):
-    user = get_object_or_404(MyUser, id=data.user_id)
-    problem = get_object_or_404(Problem, id=data.problem_id)
-    language = get_object_or_404(Language, id=data.language_id)
+from typing import List
 
-    solution = Solution.log_solution(
+
+# 📝 Schema - Kiruvchi va chiquvchi ma'lumotlarni aniqlash
+class SolutionSchema(Schema):
+    user_id: int
+    problem_id: int
+    language_id: int
+    code: str
+
+class SolutionResponseSchema(Schema):
+    id: int
+    user_id: int
+    problem_id: int
+    language_id: int
+    code: str
+    is_accepted: bool
+    execution_time: float
+    memory_usage: float
+    score: int
+    passed_tests: int
+    total_tests: int
+    created_at: str
+    updated_at: str
+
+# 🚀 Foydalanuvchi yechimini yaratish (POST)
+@solution_url_api.post("/solutions/", response=SolutionResponseSchema)
+def create_solution(request, payload: SolutionSchema):
+    user = get_object_or_404(MyUser, id=payload.user_id)
+    problem = get_object_or_404(Problem, id=payload.problem_id)
+    language = get_object_or_404(Language, id=payload.language_id)
+
+    solution = Solution.objects.create(
         user=user,
         problem=problem,
         language=language,
-        code=data.code,
-        execution_time=data.execution_time,
-        memory_usage=data.memory_usage,
-        passed_tests=data.passed_tests,
-        total_tests=data.total_tests
+        code=payload.code
     )
+    
     return solution
+
+# 📌 Barcha yechimlarni olish (GET)
+@solution_url_api.get("/solutions/", response=List[SolutionResponseSchema])
+def get_solutions(request):
+    return Solution.objects.all()
+
+# 🎯 Muayyan foydalanuvchining yechimlarini olish
+@solution_url_api.get("/solutions/user/{user_id}", response=List[SolutionResponseSchema])
+def get_user_solutions(request, user_id: int):
+    return Solution.objects.filter(user__id=user_id)
+
+# 🎯 Muayyan masalaga oid yechimlarni olish
+@solution_url_api.get("/solutions/problem/{problem_id}", response=List[SolutionResponseSchema])
+def get_problem_solutions(request, problem_id: int):
+    return Solution.objects.filter(problem__id=problem_id)
+
 
 
 # ✅ UserQuizResult yaratish (POST)
