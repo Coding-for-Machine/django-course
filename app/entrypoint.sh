@@ -4,7 +4,7 @@
 if [ "$DJANGO_ENV" = "production" ]; then
     echo "Ishlab chiqarish muhitiga o'tilmoqda..."
     # Agar ishlab chiqarish bo'lsa, collectstatic ishlatilsin
-    python ./app/manage.py collectstatic --noinput
+    python ./manage.py collectstatic --noinput
 else
     echo "Ishlab chiqish muhitida..."
 fi
