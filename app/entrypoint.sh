@@ -38,5 +38,5 @@ if [ "$DJANGO_ENV" = "production" ]; then
 else
     # Django serverini ishga tushurish (staging uchun)
     echo "Django serveri ishga tushurilmoqda..."
-    exec "$@" >> $LOG_FILE 2>&1
+    exec "$@"  2>&1
 fi
