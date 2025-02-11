@@ -34,7 +34,7 @@ python manage.py clear_cache >> $LOG_FILE 2>&1
 # Gunicorn serverini ishga tushurish (production uchun)
 if [ "$DJANGO_ENV" = "production" ]; then
     echo "Gunicorn serverini ishga tushurish..."
-    exec gunicorn myproject.wsgi:application --bind 0.0.0.0:8000 >> $LOG_FILE 2>&1
+    exec gunicorn app.wsgi:application --bind 0.0.0.0:8000 >> $LOG_FILE 2>&1
 else
     # Django serverini ishga tushurish (staging uchun)
     echo "Django serveri ishga tushurilmoqda..."
