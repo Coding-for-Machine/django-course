@@ -22,7 +22,7 @@ echo "Keshni tozalash..."
 python ./app/manage.py clear_cache
 
 # Log faylini yaratish va yangilash
-LOG_FILE="/app/logs/django.log"
+LOG_FILE="./app/logs/django.log"
 echo "Django serveri boshlanishi..." > $LOG_FILE
 echo "Migratsiyalarni bajarish..." >> $LOG_FILE
 python ./app/manage.py migrate >> $LOG_FILE 2>&1
