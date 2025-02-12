@@ -86,8 +86,8 @@ class Function(models.Model):
 
 class TestCase(models.Model):
     problem = models.ForeignKey("Problem", related_name="test_algorith", on_delete=models.CASCADE)
-    input_data = models.CharField(max_length=200, help_text="Inputlar \\n bilan ajratilgan bo‘lishi kerak")
-    output_data = models.CharField(max_length=200, help_text="Output ma’lumotlari")
+    input_data_top = models.TextField(help_text="Test yuqori qismi")
+    input_data_bottom = models.TextField(help_text="Pastki qismi")
     def __str__(self):
         return f"Test for {self.problem.title}"
 
