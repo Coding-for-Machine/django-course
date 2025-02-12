@@ -2,10 +2,10 @@ from ninja import Router
 from django.shortcuts import get_object_or_404
 from .models import Solution, UserQuizResult, UserQuestionResult
 from users.models import MyUser
-from lessons.models import Problem, Language
+from lessons.models import Problem, Language, TestCase
 from savollar.models import Quiz, Question
 from ninja import Router, Schema
-
+from .run_code_api import format_code_push
 from .schemas import *
 
 solution_url_api = Router()
@@ -39,17 +39,27 @@ class SolutionResponseSchema(Schema):
 # 🚀 Foydalanuvchi yechimini yaratish (POST)
 @solution_url_api.post("/solutions/", response=SolutionResponseSchema)
 def create_solution(request, payload: SolutionSchema):
-    user = get_object_or_404(MyUser, id=payload.user_id)
+    if not request.user.is_authenticatid:
+        return None
+    user = request.user
+    # user = get_object_or_404(MyUser, id=payload.user_id)
     problem = get_object_or_404(Problem, id=payload.problem_id)
     language = get_object_or_404(Language, id=payload.language_id)
+    # get test case
+    test_case = get_object_or_404(TestCase, problem=problem, language=language)
+    if payload.code and language:
+        response = format_code_push(language, payload.code, test_case)
 
-    solution = Solution.objects.create(
-        user=user,
-        problem=problem,
-        language=language,
-        code=payload.code
-    )
-    
+        solution = Solution.objects.create(
+            user=user,
+            problem=problem,
+            language=language,
+            code=response.code,
+            is_accepted=response.is_accepted,
+            execution_time=response.execution_time,
+            memory_usage=response.memory_usage
+        )
+        
     return solution
 
 # 📌 Barcha yechimlarni olish (GET)

@@ -86,6 +86,7 @@ class Function(models.Model):
 
 class TestCase(models.Model):
     problem = models.ForeignKey("Problem", related_name="test_algorith", on_delete=models.CASCADE)
+    language = models.ForeignKey(Language, related_name="test_language", on_delete=models.CASCADE)
     input_data_top = models.TextField(help_text="Test yuqori qismi")
     input_data_bottom = models.TextField(help_text="Pastki qismi")
     def __str__(self):
