@@ -13,7 +13,7 @@ def post_server(data):
         print(f"DOCKER_API manzili: {DOCKER_API}")
         print(f"So‘rov yuborilmoqda: {data}")
 
-        response = httpx.post(DOCKER_API, json=data, timeout=30)
+        response = httpx.post(DOCKER_API, json=data, timeout=60)
 
         if response.status_code in [200, 201]:
             result = response.json()
