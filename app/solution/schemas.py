@@ -1,40 +1,46 @@
-from pydantic import BaseModel, Field, ConfigDict
-from typing import Optional
+from pydantic import BaseModel
 
-# ✅ Base Model (Barcha schema'lar uchun umumiy sozlamalar)
-class BaseSchema(BaseModel):
-    model_config = ConfigDict(from_attributes=True)  # ORM Mode
+# 🔹 Yechim so‘rovlarini olish uchun Pydantic schema
+class SolutionSchema(BaseModel):
+    problem_id: int
+    language_id: int
+    code: str
 
+# 🔹 Yechim natijalarini qaytarish uchun schema
+class SolutionResponseSchema(BaseModel):
+    id: int
+    user_id: int
+    problem_id: int
+    language_id: int
+    code: str
+    is_accepted: bool
+    execution_time: float
+    memory_usage: int
+    created_at: str  # datetime -> string
+    updated_at: str  # datetime -> string
 
-# ✅ Solution Schema
-class SolutionSchema(BaseSchema):
-    user_id: int = Field(..., description="Foydalanuvchi ID si")
-    problem_id: int = Field(..., description="Muammo (problem) ID si")
-    language_id: int = Field(..., description="Dasturlash tili ID si")
-    code: str = Field(..., description="Foydalanuvchining kod yechimi")
-    execution_time: float = Field(0.0, description="Bajarilish vaqti (sekund)")
-    memory_usage: float = Field(0.0, description="Xotira ishlatilishi (MB)")
-    passed_tests: int = Field(0, description="O'tgan testlar soni")
-    total_tests: int = Field(0, description="Jami testlar soni")
+    @staticmethod
+    def from_orm(obj):
+        return SolutionResponseSchema(
+            id=obj.id,
+            user_id=obj.user.id,
+            problem_id=obj.problem.id,
+            language_id=obj.language.id,
+            code=obj.code,
+            is_accepted=obj.is_accepted,
+            execution_time=obj.execution_time,
+            memory_usage=obj.memory_usage,
+            created_at=obj.created_at.isoformat(),
+            updated_at=obj.updated_at.isoformat()
+        )
 
-class SolutionOutSchema(SolutionSchema):
-    score: int = Field(0, description="Foydalanuvchi bahosi")
-    is_accepted: bool = Field(False, description="Qabul qilindi yoki yo'q")
+class UserQuizResultSchema(BaseModel):
+    user_id: int
+    quiz_id: int
+    correct_answers: int
+    total_questions: int
 
-
-# ✅ User Quiz Result Schema
-class UserQuizResultSchema(BaseSchema):
-    user_id: int = Field(..., description="Foydalanuvchi ID si")
-    quiz_id: int = Field(..., description="Quiz ID si")
-    correct_answers: int = Field(..., description="To'g'ri javoblar soni")
-    total_questions: int = Field(..., description="Jami savollar soni")
-
-class UserQuizResultOutSchema(UserQuizResultSchema):
-    score: int = Field(..., description="Foydalanuvchi to'plagan ballari")
-
-
-# ✅ User Question Result Schema
-class UserQuestionResultSchema(BaseSchema):
-    user_id: int = Field(..., description="Foydalanuvchi ID si")
-    question_id: int = Field(..., description="Savol ID si")
-    is_correct: bool = Field(..., description="Javob to‘g‘rimi yoki noto‘g‘ri")
+class UserQuestionResultSchema(BaseModel):
+    user_id: int
+    question_id: int
+    is_correct: bool

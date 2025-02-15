@@ -7,61 +7,60 @@ from savollar.models import Quiz, Question
 from ninja import Router, Schema
 # from .run_code_api import format_code_push
 from .schemas import *
+from .run_code_api import post_server
+from users.api_auth import api_auth_user_required
 
+from typing import List
 solution_url_api = Router()
 
 
-from typing import List
-
-
-# 📝 Schema - Kiruvchi va chiquvchi ma'lumotlarni aniqlash
-class SolutionSchema(Schema):
-    user_id: int
-    problem_id: int
-    language_id: int
-    code: str
-
-class SolutionResponseSchema(Schema):
-    id: int
-    user_id: int
-    problem_id: int
-    language_id: int
-    code: str
-    is_accepted: bool
-    execution_time: float
-    memory_usage: float
-    score: int
-    passed_tests: int
-    total_tests: int
-    created_at: str
-    updated_at: str
-
-# 🚀 Foydalanuvchi yechimini yaratish (POST)
+"""{
+  "user_id": 1,
+  "problem_id": 1,
+  "language_id": 1,
+  "code": "class Node:\n    def __init__(self, data):\n        self.data = data\n        self.next = None\n\nclass LinkedList:\n    def __init__(self):\n        self.head = None\n\n    def append(self, data):\n        new_node = Node(data)\n        if not self.head:\n            self.head = new_node\n            return\n        last = self.head\n        while last.next:\n            last = last.next\n        last.next = new_node\n\n    def find(self, data):\n        current = self.head\n        while current:\n            if current.data == data:\n                return True\n            current = current.next\n        return False\n\n    def delete(self, data):\n        current = self.head\n        if current and current.data == data:\n            self.head = current.next\n            return\n        prev = None\n        while current and current.data != data:\n            prev = current\n            current = current.next\n        if current:\n            prev.next = current.next\n\n    def to_list(self):\n        result = []\n        current = self.head\n        while current:\n            result.append(current.data)\n            current = current.next\n        return result"
+}"""
+#  (Foydalanuvchi yechimini yaratish)
 @solution_url_api.post("/solutions/", response=SolutionResponseSchema)
 def create_solution(request, payload: SolutionSchema):
-    # if not request.user.is_authenticatid:
-    #     return None
-    # user = request.user
-    # # user = get_object_or_404(MyUser, id=payload.user_id)
-    # problem = get_object_or_404(Problem, id=payload.problem_id)
-    # language = get_object_or_404(Language, id=payload.language_id)
-    # # get test case
-    # test_case = get_object_or_404(TestCase, problem=problem, language=language)
-    # if payload.code and language:
-    #     response = format_code_push(language, payload.code, test_case)
+    """Foydalanuvchi yechimini yaratish va Docker API orqali tekshirish"""
+    
+    user = request.user
+    problem = get_object_or_404(Problem, id=payload.problem_id)
+    language = get_object_or_404(Language, id=payload.language_id)
 
-    #     solution = Solution.objects.create(
-    #         user=user,
-    #         problem=problem,
-    #         language=language,
-    #         code=response.code,
-    #         is_accepted=response.is_accepted,
-    #         execution_time=response.execution_time,
-    #         memory_usage=response.memory_usage
-    #     )
-        
-    # return solution
-    pass
+    test_case = TestCase.objects.filter(problem=problem, language=language).first()
+    
+    if not test_case:
+        return {"error": "Test case topilmadi!"}
+
+    user_code = payload.code
+
+    # 🚀 Docker API-ga kodni jo‘natish
+    docker_data = {
+        "user_code": user_code,
+        "language": language.name,
+        "test_cases": test_case.input_data_bottom
+    }
+    response = post_server(docker_data)
+
+    if response is None:
+        return {"error": "Kod bajarilmadi, Docker API ishlamayapti!"}
+
+    # 🚀 Sinxron holatda bazaga yozish
+    solution = Solution.objects.create(
+        user=user,
+        problem=problem,
+        language=language,
+        code=user_code,
+        is_accepted=response.get("is_accepted", False),
+        execution_time=response.get("time", 0),
+        memory_usage=response.get("memory", 0)
+    )
+
+    # 🔹 JSON formatga mos ravishda qaytarish
+    return SolutionResponseSchema.from_orm(solution)
+
 
 # 📌 Barcha yechimlarni olish (GET)
 @solution_url_api.get("/solutions/", response=List[SolutionResponseSchema])

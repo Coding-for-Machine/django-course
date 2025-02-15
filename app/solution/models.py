@@ -22,8 +22,8 @@ class Solution(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)  # Yaratilgan vaqt
     updated_at = models.DateTimeField(auto_now=True)  # Yangilangan vaqt
 
-    class Meta:
-        unique_together = ('user', 'problem', 'language')  # Har bir user har bir problemni har xil tilda yechishi mumkin
+    # class Meta:
+    #     unique_together = ('user', 'problem', 'language')  # Har bir user har bir problemni har xil tilda yechishi mumkin
 
     def __str__(self):
         return f"{self.user.email} - {self.problem.title} ({self.language}) - {'Accepted' if self.is_accepted else 'Pending'}"

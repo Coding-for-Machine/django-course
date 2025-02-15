@@ -1,15 +1,28 @@
 import os
 from dotenv import load_dotenv
-import asyncio
-from lessons.models import TestCase
-import aiohttp
+import httpx
+
 # .env faylini yuklash
 load_dotenv()
 
-DOCKER_API = os.getenv("DOCKER_BACKEND_API")
+# Docker API manzilini yuklash
+DOCKER_API = os.getenv("DOCKER_BACKEND_API", "http://ip172-18-0-69-cuocbvol2o9000bs38v0-3000.direct.labs.play-with-docker.com/run-test")
 
-async def format_code_push(user_code, test_case):
-    if user_code and test_case:
+def post_server(data):
+    try:
+        print(f"DOCKER_API manzili: {DOCKER_API}")
+        print(f"So‘rov yuborilmoqda: {data}")
 
+        response = httpx.post(DOCKER_API, json=data, timeout=30)
 
-
+        if response.status_code in [200, 201]:
+            result = response.json()
+            if "error" in result:
+                print(f"Docker API xatosi: {result['error']}")
+                return None
+            return result
+        else:
+            print(f"Xatolik! Status code: {response.status_code}, Javob: {response.text}")
+    except httpx.RequestError as e:
+        print(f"API so‘rovda xatolik: {e}")
+    return None  
