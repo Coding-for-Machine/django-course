@@ -1,5 +1,3 @@
-import random
-import string
 import qrcode
 from io import BytesIO
 from django.db import models
@@ -40,11 +38,14 @@ class Certificate(models.Model):
     qr_code = models.ImageField(upload_to="certificates/qrcodes/", blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True, null=True)
 
+    class Meta:
+        unique_together = ("user", "course")
+
     def generate_certificate_id(self):
         """Sertifikatni ID sini yaratish"""
         if not self.issue_date:
             self.issue_date = datetime.today().date()  # Hozirgi sanani ishlatish
-        return f"CR-{self.user.id}-{self.issue_date.strftime('%Y%m%d')}"
+        return f"CR-{self.course.id}-{self.user.id}-{self.issue_date.strftime('%Y%m%d')}"
 
     def generate_qr_code(self):
         """Admin tomonidan sozlangan sertifikat URL manzili orqali QR-kod yaratish"""

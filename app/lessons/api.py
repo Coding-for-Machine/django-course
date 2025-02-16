@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from users.api_auth import api_auth_user_required
 router = Router()
 
-@router.get("/{slug}", response=LessonSchema, auth=api_auth_user_required)
+@router.get("/{slug}", response=LessonSchema)#  auth=api_auth_user_required
 def get_lesson_by_slug(request, slug: str):
     # Slug orqali Lesson obyektini olish
     lesson = get_object_or_404(Lesson, slug=slug)
