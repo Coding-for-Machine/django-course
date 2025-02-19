@@ -6,7 +6,7 @@ import httpx
 load_dotenv()
 
 # Docker API manzilini yuklash
-DOCKER_API = os.getenv("DOCKER_BACKEND_API", "http://ip172-18-0-24-cuosoagl2o9000fkt6e0-3000.direct.labs.play-with-docker.com/run-test")
+DOCKER_API = os.getenv("DOCKER_BACKEND_API", "http://ip172-18-0-76-cupi9liim2rg00eath6g-3000.direct.labs.play-with-docker.com/run-test")
 
 def post_server(data):
     try:

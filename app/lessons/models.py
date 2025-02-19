@@ -3,6 +3,8 @@ from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
 import random
 import string
+import uuid
+uuid.uuid4
 from courses.models import MyModules
 
 def generate_slug_with_case(length=8):

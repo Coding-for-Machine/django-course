@@ -3,7 +3,7 @@ from django.utils import timezone
 from users.models import MyUser  # Foydalanuvchi modeli
 from lessons.models import Lesson, Problem
 from solution.models import Solution, UserQuizResult
-
+from django.db.models import Sum
 
 # ==========================
 # 1. UserActivity modeli - Foydalanuvchi faoliyatini saqlash
@@ -76,19 +76,17 @@ class UserLeaderboard(models.Model):
     last_updated = models.DateTimeField(auto_now=True)
 
     @classmethod
-    def update_leaderboard(cls):
-        """Foydalanuvchilar reytingini yangilash"""
-        users = MyUser.objects.all()
-        for user in users:
-            quiz_score = UserQuizResult.objects.filter(user=user).aggregate(models.Sum('score'))['score__sum'] or 0
-            activity_score = UserActivityDaily.objects.filter(user=user).aggregate(models.Sum('score'))['score__sum'] or 0
-            problem_score = UserProblemStatus.objects.filter(user=user).aggregate(models.Sum('score'))['score__sum'] or 0
-            solution_score = Solution.objects.filter(user=user).aggregate(models.Sum('score'))['score__sum'] or 0  # ✅ Solution ballari qo'shildi
+    def update_leaderboard(cls, user):
+        quiz_score = UserQuizResult.objects.filter(user=user).aggregate(Sum('score'))['score__sum'] or 0
+        activity_score = UserActivityDaily.objects.filter(user=user).aggregate(Sum('score'))['score__sum'] or 0
+        problem_score = UserProblemStatus.objects.filter(user=user).aggregate(Sum('score'))['score__sum'] or 0
+        solution_score = Solution.objects.filter(user=user).aggregate(Sum('score'))['score__sum'] or 0  # ✅ Solution ballari qo'shildi
 
-            total_score = quiz_score + activity_score + problem_score + solution_score
-            leaderboard, created = cls.objects.get_or_create(user=user)
-            leaderboard.total_score = total_score
-            leaderboard.save()
+        total_score = quiz_score + activity_score + problem_score + solution_score
+        leaderboard, created = cls.objects.get_or_create(user=user)
+        leaderboard.total_score = total_score
+        leaderboard.save()
+
 
 
 # ==========================
@@ -117,19 +115,27 @@ class UserLessonStatus(models.Model):
 class UserProblemStatus(models.Model):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
-    is_completed = models.BooleanField(default=False)  # Muammo yechimi tugallandimi?
-    score = models.PositiveIntegerField(default=0)  # Ball
+    is_completed = models.BooleanField(default=False)  
+    score = models.PositiveIntegerField(default=0)  
 
     def __str__(self):
         return f"User: {self.user.email}, Problem: {self.problem.title}, Completed: {self.is_completed}"
+    class Meta:
+        unique_together = ('user', 'problem')
+    @classmethod
+    def mark_completed(cls, user, problem, difficulty):
+        status, created = cls.objects.get_or_create(user=user, problem=problem)
 
-    def update_score(self, difficulty_level=1):
-        """Muammo yechimi uchun ballni yangilash"""
-        if self.is_completed:
-            self.score = difficulty_level * 10  # Masalan, qiyinlik darajasiga ko‘ra ball
-        else:
-            self.score = 0
-        self.save()
+        if not status.is_completed:  # Faqat bir marta o'zgarishi kerak
+            status.is_completed = True
+            if difficulty=="easy":
+             status.score = 1
+            elif difficulty=="medium":
+                status.score = 2
+            elif difficulty=="hard":
+                status.score==2
+            status.save()
+
 
 
 

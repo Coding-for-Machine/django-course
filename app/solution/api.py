@@ -48,7 +48,7 @@ def create_solution(request, payload: SolutionSchema):
         return {"error": "Kod bajarilmadi, Docker API ishlamayapti!"}
 
     # 🚀 Sinxron holatda bazaga yozish
-    solution = Solution.objects.create(
+    solution = Solution.create(
         user=user,
         problem=problem,
         language=language,
@@ -62,17 +62,14 @@ def create_solution(request, payload: SolutionSchema):
     return SolutionResponseSchema.from_orm(solution)
 
 
-# 📌 Barcha yechimlarni olish (GET)
 @solution_url_api.get("/solutions/", response=List[SolutionResponseSchema])
 def get_solutions(request):
     return Solution.objects.all()
 
-# 🎯 Muayyan foydalanuvchining yechimlarini olish
 @solution_url_api.get("/solutions/user/{user_id}", response=List[SolutionResponseSchema])
 def get_user_solutions(request, user_id: int):
     return Solution.objects.filter(user__id=user_id)
 
-# 🎯 Muayyan masalaga oid yechimlarni olish
 @solution_url_api.get("/solutions/problem/{problem_id}", response=List[SolutionResponseSchema])
 def get_problem_solutions(request, problem_id: int):
     return Solution.objects.filter(problem__id=problem_id)
@@ -100,7 +97,7 @@ def create_question_result(request, data: UserQuestionResultSchema):
     user = get_object_or_404(MyUser, id=data.user_id)
     question = get_object_or_404(Question, id=data.question_id)
 
-    result = UserQuestionResult.log_answer(
+    result = UserQuestionResult.create_answer(
         user=user,
         question=question,
         is_correct=data.is_correct
