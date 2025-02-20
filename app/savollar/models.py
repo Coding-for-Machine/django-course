@@ -105,11 +105,3 @@ class Answer(BaseQuiz):
         return f"{self.description}"
 
 
-class AnswerTrue(Answer):
-    class Meta:
-        proxy=True
-
-    def is_true(self):
-        self.is_correct=True
-        self.save()
-        

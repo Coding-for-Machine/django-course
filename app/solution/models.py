@@ -95,3 +95,15 @@ class UserQuestionResult(models.Model):
         result.is_correct = is_correct
         result.save()
         return result
+
+
+class AnswerTrue(UserQuestionResult):
+    class Meta:
+        proxy=True
+
+    def is_true(self):
+        if self.is_correct:
+            self.is_correct=True
+            self.save()
+        
+        

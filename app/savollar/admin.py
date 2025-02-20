@@ -2,7 +2,7 @@ from django.contrib import admin
 from django import forms
 from django.contrib.contenttypes.models import ContentType
 from lessons.models import Lesson
-from .models import Quiz, Question, Answer, AnswerTrue
+from .models import Quiz, Question, Answer
 
 
 
@@ -75,8 +75,3 @@ class AnswerAdmin(admin.ModelAdmin):
     list_filter = ('is_correct',)
     search_fields = ('description',)
 
-
-class UsersAnswerTrue(admin.ModelAdmin):
-    list_display = ["is_true"]
-
-admin.site.register(AnswerTrue, UsersAnswerTrue)

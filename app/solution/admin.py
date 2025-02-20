@@ -1,6 +1,13 @@
 from django.contrib import admin
-from .models import Solution, UserQuizResult, UserQuestionResult
+from .models import AnswerTrue, Solution, UserQuizResult, UserQuestionResult
 
+
+
+
+class UsersAnswerTrue(admin.ModelAdmin):
+    list_display = ["is_true"]
+
+admin.site.register(AnswerTrue, UsersAnswerTrue)
 # ==============================
 # 1️⃣ Solution (Foydalanuvchi Yechimi)
 # ==============================
