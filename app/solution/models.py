@@ -1,16 +1,17 @@
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
-from app.userstatus.models import UserProblemStatus
+from lessons.models import Language, Problem
+from userstatus.models import UserProblemStatus
 from savollar.models import Question, Quiz
 from users.models import MyUser
-from lessons.models import Problem, Language
+# from lessons.models import Problem, Language
 
 
 
 class Solution(models.Model):
-    user = models.ForeignKey('MyUser', on_delete=models.CASCADE)
-    problem = models.ForeignKey('Problem', on_delete=models.CASCADE)
-    language = models.ForeignKey('Language', on_delete=models.CASCADE)  
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
+    problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
+    language = models.ForeignKey(Language, on_delete=models.CASCADE)  
     code = models.TextField()
     is_accepted = models.BooleanField(default=False)
     execution_time = models.FloatField(default=0.0)  

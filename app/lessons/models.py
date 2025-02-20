@@ -1,16 +1,8 @@
-import os
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
-import random
-import string
-import uuid
-uuid.uuid4
+from .generate_slug import generate_slug_with_case
 from courses.models import MyModules
 
-def generate_slug_with_case(length=8):
-    characters = string.ascii_lowercase + string.ascii_uppercase + string.digits
-    slug = ''.join(random.choice(characters) for _ in range(length))
-    return slug
 
 class Language(models.Model):
     name = models.CharField(max_length=250)
@@ -18,10 +10,13 @@ class Language(models.Model):
 
     def __str__(self):
         return self.name
+    
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = generate_slug_with_case(30)  # 10 uzunlikda tasodifiy slug yaratish
+
         super().save(*args, **kwargs)
+    
 
     
 # Dars modeli - har bir modulga tegishli darslarni saqlash uchun

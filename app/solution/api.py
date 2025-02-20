@@ -4,7 +4,7 @@ from .models import Solution, UserQuizResult, UserQuestionResult
 from users.models import MyUser
 from lessons.models import Problem, Language, TestCase
 from savollar.models import Quiz, Question
-from ninja import Router, Schema
+from ninja import Router
 # from .run_code_api import format_code_push
 from .schemas import *
 from .run_code_api import post_server

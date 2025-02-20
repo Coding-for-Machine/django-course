@@ -2,13 +2,11 @@ from django.contrib import admin
 from django import forms
 from django.contrib.contenttypes.models import ContentType
 from lessons.models import Lesson
-from .models import Quiz, Question, Answer
+from .models import Quiz, Question, Answer, AnswerTrue
 
 
 
-# ==============================
-# 1️⃣ Question Form (Dynamic object_id selection)
-# ==============================
+
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
@@ -50,11 +48,11 @@ class AnswerInline(admin.TabularInline):
 # ==============================
 @admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ('title', 'slug', 'time_limit', 'is_active', 'created_at')
+    list_display = ('title', 'slug', 'time_limit', 'is_active', 'created')
     list_filter = ('title', 'is_active')
     prepopulated_fields = {'slug': ('title',)}  # Slugni avtomatik generatsiya qilish
     search_fields = ('title', 'description')
-    ordering = ('-created_at',)
+    ordering = ('-created',)
 
 # ==============================
 # 4️⃣ Question Admin
@@ -62,10 +60,10 @@ class QuizAdmin(admin.ModelAdmin):
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
     form = QuestionForm
-    list_display = ('description', 'content_type', 'object_id', 'created_at')
+    list_display = ('description', 'content_type', 'object_id', 'created')
     list_filter = ('content_type',)
     search_fields = ('description',)
-    ordering = ('-created_at',)
+    ordering = ('-created',)
     inlines = [AnswerInline]
 
 # ==============================
@@ -76,3 +74,9 @@ class AnswerAdmin(admin.ModelAdmin):
     list_display = ('description', 'question', 'is_correct')
     list_filter = ('is_correct',)
     search_fields = ('description',)
+
+
+class UsersAnswerTrue(admin.ModelAdmin):
+    list_display = ["is_true"]
+
+admin.site.register(AnswerTrue, UsersAnswerTrue)

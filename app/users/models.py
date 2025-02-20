@@ -1,13 +1,18 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group, Permission
 from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, FileExtensionValidator
 
-# Custom User Manager
+
+# Custom Manager (Soft Delete ishlaydi)
 class MyUserManager(BaseUserManager):
+    def get_queryset(self):
+        """Faol bo‘lmagan foydalanuvchilarni (is_deleted=True) yashirish"""
+        return super().get_queryset().filter(is_deleted=False)
+
     def create_user(self, email, password=None, **extra_fields):
         if not email:
-            raise ValueError("Email field is required")
+            raise ValueError("Email maydoni talab qilinadi!")
         email = self.normalize_email(email)
         extra_fields.setdefault('is_active', True)
         user = self.model(email=email, **extra_fields)
@@ -18,17 +23,31 @@ class MyUserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
+
+        assert extra_fields.get("is_staff") is True, "Superuser uchun `is_staff=True` bo‘lishi shart!"
+        assert extra_fields.get("is_superuser") is True, "Superuser uchun `is_superuser=True` bo‘lishi shart!"
+
         return self.create_user(email, password, **extra_fields)
 
 
 # Custom User Model
 class MyUser(AbstractBaseUser, PermissionsMixin):
+    ROLE_CHOICES = [
+        ("student", "Student"),
+        ("teacher", "Teacher"),
+        ("staff", "Staff"),
+        ("superuser", "Superuser"),
+    ]
+    
     email = models.EmailField(unique=True, verbose_name="Email manzil")
     first_name = models.CharField(max_length=30, blank=True, null=True, verbose_name="Ism")
     last_name = models.CharField(max_length=30, blank=True, null=True, verbose_name="Familiya")
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="student")
     is_active = models.BooleanField(default=True, verbose_name="Faol")
     is_staff = models.BooleanField(default=False, verbose_name="Xodim")
     is_deleted = models.BooleanField(default=False, verbose_name="O‘chirilgan")  # Soft delete
+    primary_group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True, related_name="primary_users")
+    supplementary_groups = models.ManyToManyField(Group, blank=True, related_name="extra_users")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan vaqti")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Yangilangan vaqti")
 
@@ -38,12 +57,12 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
     def delete(self, *args, **kwargs):
-        """Soft delete - foydalanuvchini bazadan o‘chirmasdan tizimdan olib tashlash"""
+        """Soft Delete: Foydalanuvchini o‘chirib tashlamasdan yashirin qiladi"""
         self.is_deleted = True
         self.save()
 
     def restore(self):
-        """Foydalanuvchini qayta tiklash"""
+        """Foydalanuvchini tiklash"""
         self.is_deleted = False
         self.save()
 
@@ -55,8 +74,31 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = "Foydalanuvchilar"
         ordering = ['-created_at']
 
+    def save(self, *args, **kwargs):
+        """Linux tizimiga o‘xshash guruh va huquqlarni avtomatik qo‘shish"""
+        is_new = self.pk is None  # Foydalanuvchi yangi yaratilayotganligini tekshirish
 
-# Profile Model
+        super().save(*args, **kwargs)
+
+        # Guruhni aniqlash va qo‘shish
+        group, _ = Group.objects.get_or_create(name=self.role.capitalize())
+        self.primary_group = group
+        self.groups.set([group])  # Faqat bitta primary guruhni o‘rnatish
+
+        # Staff bo‘lsa, unga maxsus ruxsatlar beriladi
+        if self.is_staff:
+            staff_group, _ = Group.objects.get_or_create(name="Staff")
+            self.supplementary_groups.add(staff_group)
+            self.groups.add(staff_group)
+
+        # Superuser bo‘lsa, barcha huquqlarga ega bo‘lsin
+        if self.is_superuser:
+            all_groups = Group.objects.all()
+            self.supplementary_groups.set(all_groups)
+            self.groups.set(all_groups)
+
+        super().save(*args, **kwargs)
+
 class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, primary_key=True, verbose_name="Foydalanuvchi")
     first_name = models.CharField(max_length=100, blank=True, null=True, verbose_name="Ism")

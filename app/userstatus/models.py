@@ -2,8 +2,11 @@ from django.db import models
 from django.utils import timezone
 from users.models import MyUser  # Foydalanuvchi modeli
 from lessons.models import Lesson, Problem
-from solution.models import Solution, UserQuizResult
 from django.db.models import Sum
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from solution.models import Solution, UserQuizResult
 
 # ==========================
 # 1. UserActivity modeli - Foydalanuvchi faoliyatini saqlash
@@ -22,7 +25,7 @@ class UserActivityDaily(BaseUserResult):
     date = models.DateField(default=timezone.now)  # Foydalanuvchi harakat qilgan sana
     activity_count = models.PositiveIntegerField(default=0)  # Nechta faoliyat bajargani
     total_duration = models.PositiveIntegerField(default=0)  # Umumiy shug‘ullanish vaqti (daqiqalarda)
-    
+    score = models.PositiveIntegerField(default=0) 
     class Meta:
         unique_together = ('user', 'date')  # Har kuni faqat bitta yozuv bo'lishi kerak
         ordering = ['-date']
@@ -127,8 +130,10 @@ class UserProblemStatus(BaseUserResult):
 
     def __str__(self):
         return f"User: {self.user.email}, Problem: {self.problem.title}, Completed: {self.is_completed}"
+    
     class Meta:
         unique_together = ('user', 'problem')
+
     @classmethod
     def mark_completed(cls, user, problem, difficulty):
         status, created = cls.objects.get_or_create(user=user, problem=problem)
