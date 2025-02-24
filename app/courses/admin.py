@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Course, Enrollment, Payment, MyModules
+from .models import Course, Enrollment, MyModules
 from django.utils.text import slugify
 
 # Course Admin
@@ -33,15 +33,6 @@ class EnrollmentAdmin(admin.ModelAdmin):
     list_filter = ('is_paid',)
 
 admin.site.register(Enrollment, EnrollmentAdmin)
-
-
-# Payment Admin
-class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('enrollment', 'amount', 'payment_status', 'payment_date')
-    search_fields = ('enrollment__user__username', 'enrollment__course__title')
-    list_filter = ('payment_status',)
-
-admin.site.register(Payment, PaymentAdmin)
 
 
 # Module Admin

@@ -3,6 +3,10 @@ from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, FileExtensionValidator
 
+# from typing import  TYPE_CHECKING
+
+# if TYPE_CHECKING:
+#     from courses.models import TimeMixsin
 
 # Custom Manager (Soft Delete ishlaydi)
 class MyUserManager(BaseUserManager):
@@ -109,7 +113,6 @@ class Profile(models.Model):
     age = models.IntegerField(default=12, validators=[MinValueValidator(12)], verbose_name="Yosh")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan vaqti")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Yangilangan vaqti")
-
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.user.email})"
 

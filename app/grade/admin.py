@@ -4,13 +4,13 @@ from .models import Grade, Group, GroupInvite, PermissionType, Resource, Comment
 
 @admin.register(Grade)
 class GradeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'student_email', 'teacher_email', 'lesson_title', 'score', 'comment', 'created']
+    list_display = ['id', 'student_email', 'teacher_email', 'lesson_title', 'score', 'comment', 'created_at']
     list_display_links = ['student_email']
     list_per_page = 10  
     list_select_related = ['student', 'teacher', 'problems', 'problems__lesson']
     search_fields = ['student__email', 'teacher__email', 'problems__lesson__title']
-    list_filter = ['teacher', 'score', 'created']
-    ordering = ['-created']
+    list_filter = ['teacher', 'score', 'created_at']
+    ordering = ['-created_at']
     autocomplete_fields = ['student', 'teacher', 'problems']
 
     @admin.display(description="Student Email")

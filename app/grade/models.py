@@ -2,11 +2,11 @@ from django.db import models
 from lessons.models import Problem
 from courses.models import Course
 from django.contrib.auth import get_user_model
-
+from courses.models import TimeMixsin
 MyUser = get_user_model()
 
 
-class Grade(models.Model):
+class Grade(TimeMixsin):
     student = models.ForeignKey(
         MyUser, on_delete=models.CASCADE, limit_choices_to={'role': 'student'}, related_name="grades"
     )
@@ -18,8 +18,6 @@ class Grade(models.Model):
     )
     score = models.PositiveIntegerField(verbose_name="Baho", default=1)
     comment = models.TextField(blank=True, null=True, verbose_name="Izoh")
-    created = models.DateTimeField(auto_now_add=True)
-
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['student', 'problems'], name='unique_student_problem_grade')
@@ -28,13 +26,13 @@ class Grade(models.Model):
             ("can_add_grade", "Baho qo‘yish"),
             ("can_view_grades", "Baholarni ko‘rish"),
         ]
-        ordering = ['-created']
+        ordering = ['-created_at']
 
     def __str__(self):
         return f"{self.student.first_name} - {self.problems.lesson.title}: {self.score} ({self.teacher.first_name})"
 
 
-class Group(models.Model):
+class Group(TimeMixsin):
     name = models.CharField(max_length=255, unique=True)
     owner = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name="owner_groups")
     students = models.ManyToManyField(
@@ -50,7 +48,7 @@ class Group(models.Model):
         return self.name
 
 
-class GroupInvite(models.Model):
+class GroupInvite(TimeMixsin):
     class StatusChoices(models.TextChoices):
         PENDING = "pending", "Pending"
         ACCEPTED = "accepted", "Accepted"
@@ -68,7 +66,7 @@ class GroupInvite(models.Model):
         return f"{self.sender} → {self.receiver} ({self.status})"
 
 
-class Resource(models.Model):
+class Resource(TimeMixsin):
     name = models.CharField(max_length=255)
     file = models.FileField(upload_to="groups/resources/")
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="resources")
@@ -81,7 +79,7 @@ class Resource(models.Model):
         return self.name
 
 
-class Comment(models.Model):
+class Comment(TimeMixsin):
     user = models.ForeignKey(
         MyUser, 
         on_delete=models.CASCADE, 
@@ -90,7 +88,6 @@ class Comment(models.Model):
     lesson = models.ForeignKey(Course, null=True, blank=True, on_delete=models.CASCADE, related_name="comments")
     resource = models.ForeignKey(Resource, null=True, blank=True, on_delete=models.CASCADE, related_name="comments")
     content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at"]
@@ -99,7 +96,7 @@ class Comment(models.Model):
         return f"{self.user.email}: {self.content[:30]}..."
 
 
-class PermissionType(models.Model):
+class PermissionType(TimeMixsin):
     class PermissionChoices(models.TextChoices):
         READ = "r", "Read"
         WRITE = "w", "Write"
@@ -110,7 +107,7 @@ class PermissionType(models.Model):
     def __str__(self):
         return self.get_code_display() 
     
-class Permission(models.Model):
+class Permission(TimeMixsin):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="permissions")
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name="permissions")
     resource = models.ForeignKey(Resource, on_delete=models.CASCADE, null=True, blank=True, related_name="resource_permissions")

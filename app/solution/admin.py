@@ -28,10 +28,10 @@ class SolutionAdmin(admin.ModelAdmin):
 # ==============================
 @admin.register(UserQuizResult)
 class UserQuizResultAdmin(admin.ModelAdmin):
-    list_display = ('user', 'quiz', 'score', 'correct_answers', 'total_questions', 'completed_at')
+    list_display = ('user', 'quiz', 'score', 'correct_answers', 'total_questions', 'created_at')
     search_fields = ('user__email', 'quiz__title')
-    list_filter = ('completed_at',)
-    readonly_fields = ('completed_at',)
+    list_filter = ('created_at',)
+    readonly_fields = ('created_at',)
 
     def get_queryset(self, request):
         """Natijalarni eng yuqori ball bo‘yicha saralash"""

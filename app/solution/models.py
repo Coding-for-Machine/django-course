@@ -6,9 +6,10 @@ from savollar.models import Question, Quiz
 from users.models import MyUser
 # from lessons.models import Problem, Language
 
+from courses.models import TimeMixsin
 
 
-class Solution(models.Model):
+class Solution(TimeMixsin):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
     language = models.ForeignKey(Language, on_delete=models.CASCADE)  
@@ -52,13 +53,12 @@ class Solution(models.Model):
 
 
 
-class UserQuizResult(models.Model):
+class UserQuizResult(TimeMixsin):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     score = models.PositiveIntegerField(default=0)  # To'plangan ball
     correct_answers = models.PositiveIntegerField(default=0)  # To'g'ri javoblar soni
     total_questions = models.PositiveIntegerField(default=0)  # Jami savollar
-    completed_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('user', 'quiz')  # Har bir foydalanuvchi har bir quiz uchun faqat bitta natijaga ega bo'lishi kerak
@@ -77,7 +77,7 @@ class UserQuizResult(models.Model):
         result.save()
         return result
 
-class UserQuestionResult(models.Model):
+class UserQuestionResult(TimeMixsin):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     is_correct = models.BooleanField(default=False)  # Foydalanuvchi javobi to‘g‘rimi?

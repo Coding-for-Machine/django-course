@@ -2,16 +2,10 @@ from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
 from .generate_slug import generate_slug_with_case
 from courses.models import MyModules
+from courses.models import TimeMixsin
 
 
-class BaseLession(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)  # Dars yaratish vaqti
-    updated_at = models.DateTimeField(auto_now=True)  # Dars yangilanish vaqti
-    
-    class Meta:
-        abstract=True
-
-class Language(BaseLession):
+class Language(TimeMixsin):
     name = models.CharField(max_length=250)
     slug = models.SlugField(blank=True, null=True)
 
@@ -27,7 +21,7 @@ class Language(BaseLession):
 
     
 # Dars modeli - har bir modulga tegishli darslarni saqlash uchun
-class Lesson(BaseLession):
+class Lesson(TimeMixsin):
     module = models.ForeignKey(MyModules, related_name="lesson", on_delete=models.CASCADE)  # Modulga bog'lanadi
     title = models.CharField(max_length=255)  # Dars nomi
     slug = models.SlugField(unique=True)  # Dars uchun noyob identifikator
@@ -50,7 +44,7 @@ class Lesson(BaseLession):
         ordering = ['created_at']  # Darslar yaratish vaqtiga ko'ra tartiblanadi
 
 
-class Problem(BaseLession):
+class Problem(TimeMixsin):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     language = models.ManyToManyField(Language,related_name='problems_in_language')
     title = models.CharField(max_length=200, blank=True, null=True)
@@ -73,7 +67,7 @@ class Problem(BaseLession):
             self.slug = generate_slug_with_case(30)  # 10 uzunlikda tasodifiy slug yaratish
         super().save(*args, **kwargs)
 
-class Function(BaseLession):
+class Function(TimeMixsin):
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
     problem = models.ForeignKey(Problem, related_name="functions", on_delete=models.CASCADE)
     function = models.TextField() 
@@ -81,7 +75,7 @@ class Function(BaseLession):
         return self.function[:30]
 
 
-class TestCase(BaseLession):
+class TestCase(TimeMixsin):
     problem = models.ForeignKey("Problem", related_name="test_algorith", on_delete=models.CASCADE)
     language = models.ForeignKey(Language, related_name="test_language", on_delete=models.CASCADE)
     input_data_top = models.TextField(help_text="Test yuqori qismi")

@@ -6,23 +6,12 @@ from django_ckeditor_5.fields import CKEditor5Field
 # from users.models import MyUser
 from courses.models import MyModules
 from .generate_slug import generate_unique_slug
-
-
-class BaseQuiz(models.Model):
-    is_active = models.BooleanField(default=True)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-updated"]
-        abstract=True
+from courses.models import TimeMixsin
 
 
 
 
-
-
-class Quiz(BaseQuiz):
+class Quiz(TimeMixsin):
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
     description = CKEditor5Field(verbose_name='Savol', config_name='extends')
@@ -30,7 +19,7 @@ class Quiz(BaseQuiz):
     time_limit = models.PositiveIntegerField(default=600)  # Sekundlarda (10 daqiqa)
     
     class Meta:
-        ordering = ['-created']
+        ordering = ['-created_at']
         verbose_name = "Quiz"
         verbose_name_plural = "Quizzes"
 
@@ -59,14 +48,14 @@ class Quiz(BaseQuiz):
 
 
 
-class Question(BaseQuiz):
+class Question(TimeMixsin):
     content_type = models.ForeignKey(ContentType, related_name="questions",on_delete=models.CASCADE)  # Model turi (Quiz yoki Topic)
     object_id = models.PositiveIntegerField()  # Bog‘langan model ID si
     content_object = GenericForeignKey('content_type', 'object_id')  # GenericForeignKey
     description = CKEditor5Field(verbose_name='Savol', config_name='extends')
     
     class Meta:
-        ordering = ['created']
+        ordering = ['-created_at']
         verbose_name = "Question"
         verbose_name_plural = "Questions"
 
@@ -92,7 +81,7 @@ class Question(BaseQuiz):
 
 
 
-class Answer(BaseQuiz):
+class Answer(TimeMixsin):
     question = models.ForeignKey(Question, related_name='answers', on_delete=models.CASCADE)
     description = CKEditor5Field(verbose_name='Savol', config_name='extends')
     is_correct = models.BooleanField(default=False)

@@ -24,7 +24,7 @@ class MyUserAdmin(BaseUserAdmin):
     filter_horizontal = ('groups', 'user_permissions')  # Bu qator endi to'g'ri ishlaydi 'groups' olib tashlandi
 
 class ProfileAdmin(admin.ModelAdmin):
-    list_display=['created_at','bio', 'profile_icon']
+    list_display=['created_at',"updated_at",'bio', 'profile_icon']
     # icon 
     def profile_icon(self, obj):
         return format_html('<i class="fa-regular fa-address-card"></i>')  # Iconni qo‘shish

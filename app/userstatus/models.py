@@ -4,7 +4,7 @@ from users.models import MyUser  # Foydalanuvchi modeli
 from lessons.models import Lesson, Problem
 from django.db.models import Sum
 from typing import TYPE_CHECKING
-
+from courses.models import TimeMixsin
 if TYPE_CHECKING:
     from solution.models import Solution, UserQuizResult
 
@@ -12,15 +12,10 @@ if TYPE_CHECKING:
 # 1. UserActivity modeli - Foydalanuvchi faoliyatini saqlash
 # ==========================
 
-class BaseUserResult(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-    
-    class Meta:
-        abstract = True
 
 
-class UserActivityDaily(BaseUserResult):
+
+class UserActivityDaily(TimeMixsin):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='daily_activities')
     date = models.DateField(default=timezone.now)  # Foydalanuvchi harakat qilgan sana
     activity_count = models.PositiveIntegerField(default=0)  # Nechta faoliyat bajargani
@@ -46,7 +41,7 @@ class UserActivityDaily(BaseUserResult):
         activity.save()
         return activity
     
-class Badge(BaseUserResult):
+class Badge(TimeMixsin):
     name = models.CharField(max_length=255)
     description = models.TextField()
     icon = models.ImageField(upload_to="badges/")  # Nishon rasmi
@@ -55,7 +50,7 @@ class Badge(BaseUserResult):
         return self.name
 
 
-class UserBadge(BaseUserResult):
+class UserBadge(TimeMixsin):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     badge = models.ForeignKey(Badge, on_delete=models.CASCADE)
     date_earned = models.DateTimeField(auto_now_add=True)
@@ -63,7 +58,7 @@ class UserBadge(BaseUserResult):
     def __str__(self):
         return f"{self.user.email} - {self.badge.name}"
 
-class UserActivitySummary(BaseUserResult):
+class UserActivitySummary(TimeMixsin):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     period_type = models.CharField(
         max_length=10,
@@ -80,7 +75,7 @@ class UserActivitySummary(BaseUserResult):
     def __str__(self):
         return f"{self.user.email} - {self.period_type}: {self.total_score} points"
 
-class UserLeaderboard(BaseUserResult):
+class UserLeaderboard(TimeMixsin):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     total_score = models.PositiveIntegerField(default=0)  # Jami ball
     last_updated = models.DateTimeField(auto_now=True)
@@ -102,7 +97,7 @@ class UserLeaderboard(BaseUserResult):
 # ==========================
 # 2. UserLessonStatus modeli - Foydalanuvchining dars holati
 # ==========================
-class UserLessonStatus(BaseUserResult):
+class UserLessonStatus(TimeMixsin):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     lesson = models.ForeignKey(Lesson, related_name="lesson_status", on_delete=models.CASCADE)
     is_completed = models.BooleanField(default=False)  # Dars tugallandimi?
@@ -122,7 +117,7 @@ class UserLessonStatus(BaseUserResult):
 # ==========================
 # 3. UserProblemStatus modeli - Foydalanuvchining problem holati
 # ==========================
-class UserProblemStatus(BaseUserResult):
+class UserProblemStatus(TimeMixsin):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
     is_completed = models.BooleanField(default=False)  

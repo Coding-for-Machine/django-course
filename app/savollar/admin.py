@@ -48,11 +48,11 @@ class AnswerInline(admin.TabularInline):
 # ==============================
 @admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ('title', 'slug', 'time_limit', 'is_active', 'created')
+    list_display = ('title', 'slug', 'time_limit', 'is_active', 'created_at')
     list_filter = ('title', 'is_active')
     prepopulated_fields = {'slug': ('title',)}  # Slugni avtomatik generatsiya qilish
     search_fields = ('title', 'description')
-    ordering = ('-created',)
+    ordering = ('-created_at',)
 
 # ==============================
 # 4️⃣ Question Admin
@@ -60,10 +60,10 @@ class QuizAdmin(admin.ModelAdmin):
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
     form = QuestionForm
-    list_display = ('description', 'content_type', 'object_id', 'created')
+    list_display = ('description', 'content_type', 'object_id', 'created_at')
     list_filter = ('content_type',)
     search_fields = ('description',)
-    ordering = ('-created',)
+    ordering = ('-created_at',)
     inlines = [AnswerInline]
 
 # ==============================

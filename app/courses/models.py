@@ -3,7 +3,16 @@ from users.models import MyUser
 from django.utils.text import slugify
 
 
-class Course(models.Model):
+#  base timemixis
+class TimeMixsin(models.Model):
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    class Meta:
+        abstract=True
+        # model yaratmaydi abstract=True
+
+class Course(TimeMixsin):
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
     price = models.PositiveIntegerField()
@@ -12,9 +21,7 @@ class Course(models.Model):
     lesson_count = models.PositiveIntegerField(blank=True, null=True)
     trailer = models.URLField(blank=True, null=True)
     unlisted = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
+    
     def __str__(self):
         return self.title
 
@@ -32,35 +39,21 @@ class Course(models.Model):
             super().save(update_fields=['lesson_count'])  # Faqat lesson_count yangilanadi
 
 
-class Enrollment(models.Model):
+class Enrollment(TimeMixsin):
     user = models.ForeignKey(MyUser, related_name='enrollments', on_delete=models.CASCADE)
     course = models.ForeignKey(Course, related_name='enrollments', on_delete=models.CASCADE)
     is_paid = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.user.email} enrolled in {self.course.title}"
 
 
-class Payment(models.Model):
-    enrollment = models.OneToOneField(Enrollment, related_name='payment', on_delete=models.CASCADE)
-    amount = models.PositiveIntegerField()
-    payment_status = models.CharField(max_length=50, choices=[('pending', 'Pending'), ('completed', 'Completed')])
-    payment_date = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Payment for {self.enrollment.course.title} by {self.enrollment.user.username}"
-
-
-class MyModules(models.Model):
+class MyModules(TimeMixsin):
     course = models.ForeignKey(Course, related_name='modules', on_delete=models.CASCADE)  # "related_name" qo‘shildi
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
     description = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
+    
     def __str__(self):
         return f"Module: {self.title} (Course: {self.course.title})"
 

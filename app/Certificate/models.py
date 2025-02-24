@@ -1,12 +1,14 @@
+
+from datetime import datetime
 import qrcode
 from io import BytesIO
 from django.db import models
 from users.models import MyUser
 from courses.models import Course
 from django.core.files.base import ContentFile
+from courses.models import TimeMixsin
 
-
-class SiteSettings(models.Model):
+class SiteSettings(TimeMixsin):
     """Admin tomonidan boshqariladigan sayt sozlamalari"""
     certificate_base_url = models.URLField(default="https://yourwebsite.com/certificate/")
 
@@ -18,7 +20,7 @@ class SiteSettings(models.Model):
         verbose_name_plural = "Sayt Sozlamalari"
 
 
-class Organization(models.Model):
+class Organization(TimeMixsin):
     """Sertifikat beruvchi tashkilot (masalan, onlayn platforma, universitet)"""
     name = models.CharField(max_length=255)
     website = models.URLField(blank=True, null=True)
@@ -27,9 +29,7 @@ class Organization(models.Model):
     def __str__(self):
         return self.name
 
-from datetime import datetime
-
-class Certificate(models.Model):
+class Certificate(TimeMixsin):
     """Umumiy sertifikat modeli"""
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
