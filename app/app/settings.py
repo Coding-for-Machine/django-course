@@ -31,7 +31,10 @@ INSTALLED_APPS = [
     'comments.apps.CommentsConfig',
     'solution.apps.SolutionConfig',
     'Certificate.apps.CertificateConfig',
+    'grade.apps.GradeConfig',
 
+    # Boshqa app'lar
+    "django_extensions",
     'corsheaders',
     'django_ckeditor_5',
     'ninja_jwt',
