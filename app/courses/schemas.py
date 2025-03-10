@@ -1,5 +1,8 @@
+from ninja import ModelSchema
 from pydantic import BaseModel
 from typing import List, Optional
+
+from .models import Course
 
 class CourseResponse(BaseModel):
     title: str
@@ -64,6 +67,18 @@ class CourseSchema(BaseModel):
 
     class Config:
         orm_mode = True
-
+# course list 
+# class CourseSchema(ModelSchema):
+#     class Config:
+#         model = Course
+#         fields = "__all__"
+# # course Create
+# class CourseCreateSchema(BaseModel):
+#     title: str
+#     price: int
+#     description: str
+#     thumbnail: str
+#     trailer: str | None = None
+#     unlisted: bool = False
 
 

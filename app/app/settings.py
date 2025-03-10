@@ -99,7 +99,8 @@ WSGI_APPLICATION = 'app.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+# https://docs.djangoproject.com/en/5.1/ref/settings/#database
+# bu nvim da qilinayapdi
 
 DATABASES = {
     'default': {

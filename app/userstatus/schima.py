@@ -1,6 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import List, Dict, Optional, Any
-
+from datetime import datetime
 
 class UserLessonStatusSchames(BaseModel):
     id: str
@@ -10,3 +10,11 @@ class UserLessonStatusSchames(BaseModel):
     progress: int
 
 
+class UserSchemas(BaseModel):
+    id: int
+    email: EmailStr
+
+class UserActivityDailyLists(BaseModel):
+    user: UserSchemas
+    date: datetime
+    

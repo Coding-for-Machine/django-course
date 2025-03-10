@@ -6,7 +6,7 @@ import json
 
 from lessons.models import Lesson
 from .models import Course, Enrollment, MyModules
-from .schemas import CoursesListResponse
+from .schemas import CoursesListResponse, CourseSchema
 from userstatus.models import UserLessonStatus
 
 from users.api_auth import api_auth_user_or_annon
@@ -143,3 +143,16 @@ def get_course_by_slug(request: HttpRequest, slug: str):
     redis_conn.setex(cache_key, 300, json.dumps(course_data))
 
     return course_data
+
+# create courses
+# @api_course.post("/courses", response=CourseSchema)
+# def create_course(request, payload: CourseCreateSchema):
+#     course = Course.objects.create(**payload.dict())
+#     return course
+
+# #  delete course
+# @api_course.delete("/courses/{course_id}")
+# def delete_course(request, course_id: int):
+#     course = Course.objects.get(id=course_id)
+#     course.delete()
+#     return {"message": "Course deleted"}
