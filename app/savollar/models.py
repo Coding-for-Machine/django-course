@@ -4,6 +4,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django_ckeditor_5.fields import CKEditor5Field
 # from users.models import MyUser
+from app.grade.models import MyUser
 from courses.models import MyModules
 from .generate_slug import generate_unique_slug
 from courses.models import TimeMixsin
@@ -17,7 +18,7 @@ class Quiz(TimeMixsin):
     description = CKEditor5Field(verbose_name='Savol', config_name='extends')
     MyModules = models.ForeignKey(MyModules, related_name='quizzes', on_delete=models.CASCADE)
     time_limit = models.PositiveIntegerField(default=600)  # Sekundlarda (10 daqiqa)
-    
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     class Meta:
         ordering = ['-created_at']
         verbose_name = "Quiz"
@@ -53,7 +54,7 @@ class Question(TimeMixsin):
     object_id = models.PositiveIntegerField()  # Bog‘langan model ID si
     content_object = GenericForeignKey('content_type', 'object_id')  # GenericForeignKey
     description = CKEditor5Field(verbose_name='Savol', config_name='extends')
-    
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     class Meta:
         ordering = ['-created_at']
         verbose_name = "Question"
@@ -85,7 +86,7 @@ class Answer(TimeMixsin):
     question = models.ForeignKey(Question, related_name='answers', on_delete=models.CASCADE)
     description = CKEditor5Field(verbose_name='Savol', config_name='extends')
     is_correct = models.BooleanField(default=False)
-
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     class Meta:
         verbose_name = "User-Javob"
         verbose_name_plural = "User-Javoblari"

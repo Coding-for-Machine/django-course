@@ -21,11 +21,12 @@ class Course(TimeMixsin):
     lesson_count = models.PositiveIntegerField(blank=True, null=True)
     trailer = models.URLField(blank=True, null=True)
     unlisted = models.BooleanField(default=False)
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     
     def __str__(self):
         return self.title
 
-    
+     
 
 class Enrollment(TimeMixsin):
     user = models.ForeignKey(MyUser, related_name='enrollments', on_delete=models.CASCADE)
@@ -41,6 +42,8 @@ class MyModules(TimeMixsin):
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
     description = models.TextField(blank=True, null=True)
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
+
     
     def __str__(self):
         return f"Module: {self.title} (Course: {self.course.title})"

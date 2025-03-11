@@ -59,7 +59,7 @@ class UserQuizResult(TimeMixsin):
     score = models.PositiveIntegerField(default=0)  # To'plangan ball
     correct_answers = models.PositiveIntegerField(default=0)  # To'g'ri javoblar soni
     total_questions = models.PositiveIntegerField(default=0)  # Jami savollar
-
+    
     class Meta:
         unique_together = ('user', 'quiz')  # Har bir foydalanuvchi har bir quiz uchun faqat bitta natijaga ega bo'lishi kerak
 

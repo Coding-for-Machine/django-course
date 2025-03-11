@@ -11,7 +11,6 @@ from django.core.validators import MinValueValidator, FileExtensionValidator
 # Custom Manager (Soft Delete ishlaydi)
 class MyUserManager(BaseUserManager):
     def get_queryset(self):
-        """Faol bo‘lmagan foydalanuvchilarni (is_deleted=True) yashirish"""
         return super().get_queryset().filter(is_deleted=False)
 
     def create_user(self, email, password=None, **extra_fields):

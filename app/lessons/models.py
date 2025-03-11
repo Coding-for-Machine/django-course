@@ -1,8 +1,10 @@
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
+
 from .generate_slug import generate_slug_with_case
 from courses.models import MyModules
 from courses.models import TimeMixsin
+from users.models import MyUser
 
 
 class Language(TimeMixsin):
@@ -31,6 +33,7 @@ class Lesson(TimeMixsin):
     )
     locked = models.BooleanField(default=False)  # Darsni qulflash holati (yopiq yoki ochiq)
     preview = models.BooleanField(default=False)  # Darsni preview qilish imkoniyati (tashrif buyurish)
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     
     def __str__(self):
         return f"Lesson: (Module: {self.module.title})"  # Dars nomi va tegishli modul nomini ko'rsatish
@@ -56,6 +59,7 @@ class Problem(TimeMixsin):
         ('hard', 'Hard'),
     ]
     difficulty = models.CharField(choices=difficulty_choices, max_length=6)
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
 
     def __str__(self):
         if self.title:
@@ -70,7 +74,8 @@ class Problem(TimeMixsin):
 class Function(TimeMixsin):
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
     problem = models.ForeignKey(Problem, related_name="functions", on_delete=models.CASCADE)
-    function = models.TextField() 
+    function = models.TextField()
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     def __str__(self):
         return self.function[:30]
 
@@ -80,6 +85,7 @@ class TestCase(TimeMixsin):
     language = models.ForeignKey(Language, related_name="test_language", on_delete=models.CASCADE)
     input_data_top = models.TextField(help_text="Test yuqori qismi")
     input_data_bottom = models.TextField(help_text="Pastki qismi")
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     def __str__(self):
         return f"Test for {self.problem.title}"
 
