@@ -11,6 +11,7 @@ from users.api import user_router
 # ✅ `urls.py` fayliga API'ni qo‘shish
 from solution.api import solution_url_api
 from userstatus.api import activity_router
+from adminapi.course_api import course_api_router
 from .api import api
 
 api.add_router("/", api_course)
@@ -19,7 +20,7 @@ api.add_router('lessons1/', problems_api)
 api.add_router('result/', solution_url_api)
 api.add_router("/user/", user_router)
 api.add_router("active/", activity_router)
-
+api.add_router("admin/", course_api_router)
 
 
 urlpatterns = [
