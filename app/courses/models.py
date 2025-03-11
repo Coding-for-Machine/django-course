@@ -25,19 +25,7 @@ class Course(TimeMixsin):
     def __str__(self):
         return self.title
 
-    def save(self, *args, **kwargs):
-        """
-        Kursni saqlashdan oldin darslar sonini hisoblash.
-        """
-        # Avval kursni saqlaymiz, chunki yangi yaratilgan kursda PK (ID) yo'q
-        is_new = self.pk is None  # Yangi kurs ekanligini tekshiramiz
-        super().save(*args, **kwargs)  # Avval kursni bazaga saqlaymiz
-        
-        # Agar kurs avvaldan mavjud bo‘lsa, unga bog‘langan modullarni hisoblash
-        if not is_new:
-            self.lesson_count = sum(module.lesson.all().count() for module in self.modules.all())  # "module_set" emas, "modules"
-            super().save(update_fields=['lesson_count'])  # Faqat lesson_count yangilanadi
-
+    
 
 class Enrollment(TimeMixsin):
     user = models.ForeignKey(MyUser, related_name='enrollments', on_delete=models.CASCADE)
