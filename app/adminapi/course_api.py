@@ -1,6 +1,6 @@
 from ninja import Router
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List
 from django.http import Http404
 from courses.models import Course
 from .auth_permission import *
@@ -27,13 +27,14 @@ class CourseCreate(BaseModel):
     lesson_count: int
     trailer: str
     unlisted: bool
+    slug: str  # Agar kerak bo'lsa
 
 # ----------------------------course api functions ----------------------
 
 # course get api -- admin uchun
 @course_api_router.get('courses-get/', response=List[CourseList], auth=[IsSuperuser(), IsStaff(), IsInGroup("Teacher")])
 def course_api_get_admin(request):
-    courses = Course.objects.all().filter(is_active=True)
+    courses = Course.objects.filter(is_active=True)
     return [
         {
             "id": course.id,
@@ -55,20 +56,9 @@ def course_api_get_slug_admin(request, course_slug: str):
     try:
         if request.user.is_staff or request.user.is_superuser:
             course = Course.objects.get(slug=course_slug)
-            return {
-                "id": course.id,
-                "title": course.title,
-                "slug": course.slug,
-                "price": course.price,
-                "description": course.description,
-                "thumbnail": course.thumbnail,
-                "lesson_count": course.lesson_count,
-                "trailer": course.trailer,
-                "unlisted": course.unlisted
-            }
         else:
             course = Course.objects.get(user=request.user, slug=course_slug)
-            return {
+        return {
             "id": course.id,
             "title": course.title,
             "slug": course.slug,
@@ -105,38 +95,25 @@ def course_api_put_admin(request, course_slug: str, data: CourseCreate):
         request_user = request.user
         if request_user.is_staff or request_user.is_superuser:
             course = Course.objects.get(slug=course_slug)
-            for key, value in data.dict().items():
-                setattr(course, key, value)
-            course.save()
-            return {
-                "id": course.id,
-                "title": course.title,
-                "slug": course.slug,
-                "price": course.price,
-                "description": course.description,
-                "thumbnail": course.thumbnail,
-                "lesson_count": course.lesson_count,
-                "trailer": course.trailer,
-                "unlisted": course.unlisted
-            }
-        elif Course.objects.get(user=request_user, slug=course_slug).exist():
+        elif Course.objects.filter(user=request_user, slug=course_slug).exists():
             course = Course.objects.get(user=request_user, slug=course_slug)
-            for key, value in data.dict().items():
-                setattr(course, key, value)
-            course.save()
-            return {
-                "id": course.id,
-                "title": course.title,
-                "slug": course.slug,
-                "price": course.price,
-                "description": course.description,
-                "thumbnail": course.thumbnail,
-                "lesson_count": course.lesson_count,
-                "trailer": course.trailer,
-                "unlisted": course.unlisted
-            }
         else:
             return {"error": "sizning darsliginggiz emas!"}
+
+        for key, value in data.dict().items():
+            setattr(course, key, value)
+        course.save()
+        return {
+            "id": course.id,
+            "title": course.title,
+            "slug": course.slug,
+            "price": course.price,
+            "description": course.description,
+            "thumbnail": course.thumbnail,
+            "lesson_count": course.lesson_count,
+            "trailer": course.trailer,
+            "unlisted": course.unlisted
+        }
     except Course.DoesNotExist:
         raise Http404("Darslik topilmadi!")
 
@@ -145,7 +122,10 @@ def course_api_put_admin(request, course_slug: str, data: CourseCreate):
 def course_api_delete_admin(request, course_slug: str):
     try:
         request_user = request.user
-        course = Course.objects.get(user = request_user, slug=course_slug)
+        if request_user.is_staff or request_user.is_superuser:
+            course = Course.objects.get(slug=course_slug)
+        else:
+            course = Course.objects.get(user=request_user, slug=course_slug)
         course.delete()
         return {"success": True, "message": "Course deleted successfully"}
     except Course.DoesNotExist:

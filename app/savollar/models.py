@@ -3,8 +3,7 @@ from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django_ckeditor_5.fields import CKEditor5Field
-# from users.models import MyUser
-from app.grade.models import MyUser
+from users.models import MyUser
 from courses.models import MyModules
 from .generate_slug import generate_unique_slug
 from courses.models import TimeMixsin

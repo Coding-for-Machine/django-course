@@ -10,63 +10,59 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
+        ("contenttypes", "0002_remove_content_type_name"),
+        ("courses", "0002_initial"),
         ("savollar", "0001_initial"),
-        ("solution", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="solution",
+            model_name="answer",
             name="user",
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
             ),
         ),
         migrations.AddField(
-            model_name="userquestionresult",
+            model_name="question",
+            name="content_type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="questions",
+                to="contenttypes.contenttype",
+            ),
+        ),
+        migrations.AddField(
+            model_name="question",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
+        ),
+        migrations.AddField(
+            model_name="answer",
             name="question",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="savollar.question"
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="answers",
+                to="savollar.question",
             ),
         ),
         migrations.AddField(
-            model_name="userquestionresult",
+            model_name="quiz",
+            name="MyModules",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="quizzes",
+                to="courses.mymodules",
+            ),
+        ),
+        migrations.AddField(
+            model_name="quiz",
             name="user",
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
             ),
-        ),
-        migrations.CreateModel(
-            name="AnswerTrue",
-            fields=[],
-            options={
-                "proxy": True,
-                "indexes": [],
-                "constraints": [],
-            },
-            bases=("solution.userquestionresult",),
-        ),
-        migrations.AddField(
-            model_name="userquizresult",
-            name="quiz",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="savollar.quiz"
-            ),
-        ),
-        migrations.AddField(
-            model_name="userquizresult",
-            name="user",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
-            ),
-        ),
-        migrations.AlterUniqueTogether(
-            name="userquestionresult",
-            unique_together={("user", "question")},
-        ),
-        migrations.AlterUniqueTogether(
-            name="userquizresult",
-            unique_together={("user", "quiz")},
         ),
     ]

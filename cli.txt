@@ -1,1 +1,0 @@
-python manage.py graph_models -a -o diagram.png
