@@ -3,6 +3,7 @@ from ninja.errors import HttpError
 from pydantic import BaseModel
 from typing import List
 from datetime import datetime
+from .auth_permission import IsStaff, IsSuperuser
 from lessons.models import Problem, Language
 
 problems_router_api = Router()
@@ -31,7 +32,7 @@ class ProblemCreate(BaseModel):
 # ---------------- problem crud --------------------
 
 # problem get
-@problems_router_api.get("/", response=List[ProblemList])
+@problems_router_api.get("/", response=List[ProblemList], auth=[IsSuperuser(), IsStaff()])
 def problems_get_api(request):
     problems = Problem.objects.all()
     return [
@@ -51,7 +52,7 @@ def problems_get_api(request):
     ]
 
 # problem get slug
-@problems_router_api.get("/{slug}", response=ProblemList)
+@problems_router_api.get("/{slug}", response=ProblemList, auth=[IsSuperuser(), IsStaff()])
 def problems_get_slug_api(request, slug: str):
     try:
         problem = Problem.objects.get(slug=slug)
@@ -73,7 +74,7 @@ def problems_get_slug_api(request, slug: str):
         raise HttpError(500, f"Xato yuz berdi: {str(e)}")
 
 # created
-@problems_router_api.post("/create/", response=ProblemList)
+@problems_router_api.post("/create/", response=ProblemList, auth=[IsSuperuser(), IsStaff()])
 def problems_created(request, data: ProblemCreate):
     try:
         # Problem obyektini yaratish
@@ -104,7 +105,7 @@ def problems_created(request, data: ProblemCreate):
         raise HttpError(400, f"Problem yaratishda xato: {str(e)}")
 
 # problem update
-@problems_router_api.put("/update/{slug}", response=ProblemList)
+@problems_router_api.put("/update/{slug}", response=ProblemList, auth=[IsSuperuser(), IsStaff()])
 def problems_update(request, slug: str, data: ProblemCreate):
     try:
         problem = Problem.objects.get(slug=slug)
@@ -138,7 +139,7 @@ def problems_update(request, slug: str, data: ProblemCreate):
         raise HttpError(400, f"Problemni yangilashda xato: {str(e)}")
 
 # problem delete
-@problems_router_api.delete("/delete/{slug}")
+@problems_router_api.delete("/delete/{slug}",  auth=[IsSuperuser(), IsStaff()])
 def problems_delete(request, slug: str):
     try:
         problem = Problem.objects.get(slug=slug)

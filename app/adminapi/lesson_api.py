@@ -3,6 +3,7 @@ from ninja.errors import HttpError
 from lessons.models import Lesson
 from typing import List
 from pydantic import BaseModel
+from .auth_permission import IsSuperuser, IsStaff
 
 lesson_router_api = Router()
 
@@ -28,7 +29,7 @@ class LessonCreate(BaseModel):
 # ----------------------- crud schemas ---------------------
 
 # lesson list api - http method get
-@lesson_router_api.get("/", response=List[LessonList])
+@lesson_router_api.get("/", response=List[LessonList], auth=[IsSuperuser(), IsStaff()])
 def lesson_list_api(request):
     lessons = Lesson.objects.filter(is_active=True)
     return [
@@ -46,7 +47,7 @@ def lesson_list_api(request):
     ]
 
 # lesson ni o'qish get slug bo'yicha
-@lesson_router_api.get("/{slug}", response=LessonList)
+@lesson_router_api.get("/{slug}", response=LessonList, auth=[IsSuperuser(), IsStaff()])
 def lesson_detail_api(request, slug: str):
     try:
         lesson = Lesson.objects.get(slug=slug, is_active=True)
@@ -66,7 +67,7 @@ def lesson_detail_api(request, slug: str):
         raise HttpError(500, f"Xato yuz berdi: {str(e)}")
 
 # lesson ga qo'shish - create lesson
-@lesson_router_api.post("/create/", response=LessonList)
+@lesson_router_api.post("/create/", response=LessonList, auth=[IsSuperuser(), IsStaff()])
 def lesson_create(request, data: LessonCreate):
     try:
         lesson = Lesson.objects.create(
@@ -91,7 +92,7 @@ def lesson_create(request, data: LessonCreate):
         raise HttpError(400, f"Lesson yaratishda xato: {str(e)}")
 
 # lesson ni update qilish uchun
-@lesson_router_api.put("/update/{slug}", response=LessonList)
+@lesson_router_api.put("/update/{slug}", response=LessonList, auth=[IsSuperuser(), IsStaff()])
 def lesson_update_api(request, slug: str, data: LessonCreate):
     try:
         lesson = Lesson.objects.get(slug=slug, is_active=True)
@@ -114,7 +115,7 @@ def lesson_update_api(request, slug: str, data: LessonCreate):
         raise HttpError(400, f"Lessonni yangilashda xato: {str(e)}")
 
 # lesson ni o'chirish
-@lesson_router_api.delete("/delete/{slug}")
+@lesson_router_api.delete("/delete/{slug}", auth=[IsSuperuser(), IsStaff()])
 def lesson_delete_api(request, slug: str):
     try:
         lesson = Lesson.objects.get(slug=slug, is_active=True)

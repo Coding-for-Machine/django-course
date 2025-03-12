@@ -1,7 +1,7 @@
 from ninja import Router
 from ninja.errors import HttpError
 from lessons.models import Function
-
+from .auth_permission import IsSuperuser, IsStaff
 
 # ------------------ schemas function-------------------------
 from pydantic import BaseModel
@@ -29,7 +29,7 @@ class FunctionCreate(BaseModel):
 
 function_router_api = Router()
 #  get func 
-@function_router_api.get("/", response=List[FunctionList])
+@function_router_api.get("/", response=List[FunctionList], auth=[IsSuperuser(), IsStaff()])
 def func_get(request):
     return [
         {
@@ -46,7 +46,7 @@ def func_get(request):
     ]
 
 
-@function_router_api.get("{id}/", response=FunctionList)
+@function_router_api.get("{id}/", response=FunctionList, auth=[IsSuperuser(), IsStaff()])
 def func_get(request, id: int):
     try:
         func = Function.objects.get(id=id)
@@ -63,7 +63,7 @@ def func_get(request, id: int):
     except Exception as e:
         raise HttpError(404, "Topilmadi!")
     
-@function_router_api.post("create/", response=FunctionList)
+@function_router_api.post("create/", response=FunctionList, auth=[IsSuperuser(), IsStaff()])
 def func_post(request, data: FunctionCreate):
     try:
         func = Function.objects.create(**data.dict())
@@ -80,7 +80,7 @@ def func_post(request, data: FunctionCreate):
     except Exception as e:
         raise HttpError(403, "nimadir xato ketti!")
 
-@function_router_api.put("update/", response=FunctionList)
+@function_router_api.put("update/", response=FunctionList, auth=[IsSuperuser(), IsStaff()])
 def func_update(request, id: int, data: FunctionCreate):
     try:
         func = Function.objects.get(id=id)
@@ -100,7 +100,7 @@ def func_update(request, id: int, data: FunctionCreate):
     except Exception as e:
         raise HttpError(404, "Topilmadi!")
     
-@function_router_api.put("delete/", response=FunctionList)
+@function_router_api.put("delete/", response=FunctionList, auth=[IsSuperuser(), IsStaff()])
 def func_delete(request, id: int, data: FunctionCreate):
     try:
         func = Function.objects.get(id=id)

@@ -3,6 +3,7 @@ from ninja.errors import HttpError
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
+from .auth_permission import IsStaff, IsSuperuser
 from savollar.models import Quiz
 from courses.models import MyModules
 
@@ -39,7 +40,7 @@ class QuizSchemaUpdate(BaseModel):
 quize_router = Router()
 
 # Get all quizzes
-@quize_router.get("/", response=List[QuizSchemaList])
+@quize_router.get("/", response=List[QuizSchemaList], auth=[IsSuperuser(), IsStaff()])
 def quize_get(request):
     quizzes = Quiz.objects.all()
     return [
@@ -58,7 +59,7 @@ def quize_get(request):
     ]
 
 # Create a new quiz
-@quize_router.post("create/", response=QuizSchemaList)
+@quize_router.post("create/", response=QuizSchemaList, auth=[IsSuperuser(), IsStaff()])
 def quize_create(request, payload: QuizSchemaCreate):
     try:
         # Quiz obyektini yaratish
@@ -88,7 +89,7 @@ def quize_create(request, payload: QuizSchemaCreate):
         raise HttpError(400, f"Quiz yaratishda xato: {str(e)}")
 
 # Update a quiz
-@quize_router.put("update/{quiz_id}", response=QuizSchemaList)
+@quize_router.put("update/{quiz_id}", response=QuizSchemaList, auth=[IsSuperuser(), IsStaff()])
 def quize_update(request, quiz_id: int, payload: QuizSchemaUpdate):
     try:
         quiz = Quiz.objects.filter(id=quiz_id).first()
@@ -130,7 +131,7 @@ def quize_update(request, quiz_id: int, payload: QuizSchemaUpdate):
         raise HttpError(400, f"Quizni yangilashda xato: {str(e)}")
 
 # Delete a quiz
-@quize_router.delete("delete/{quiz_id}")
+@quize_router.delete("delete/{quiz_id}", auth=[IsSuperuser(), IsStaff()])
 def quize_delete(request, quiz_id: int):
     try:
         quiz = Quiz.objects.filter(id=quiz_id).first()
@@ -142,7 +143,7 @@ def quize_delete(request, quiz_id: int):
         raise HttpError(400, f"Quizni o'chirishda xato: {str(e)}")
 
 # Search quizzes by title and description
-@quize_router.get("/search/", response=List[QuizSchemaList])
+@quize_router.get("/search/", response=List[QuizSchemaList], auth=[IsSuperuser(), IsStaff()])
 def quize_search(
     request,
     search: str = QueryEx(..., min_length=3, description="Quizni sarlavha yoki tavsif bo'yicha qidirish (kamida 3 belgi)"),

@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import List
 from courses.models import MyModules
 from django.http import Http404
+from .auth_permission import IsSuperuser, IsStaff
 
 api_module_router = Router()
 
@@ -28,7 +29,7 @@ class ModuleCreate(BaseModel):
 
 # -------------------modules api CRUD-------------------------------------------
 
-@api_module_router.get("/module-get/", response=List[ModuleList])
+@api_module_router.get("/module-get/", response=List[ModuleList], auth=[IsSuperuser(), IsStaff()])
 def get_module_api(request):
     modules = MyModules.objects.filter(is_active=True)
     return [
@@ -45,7 +46,7 @@ def get_module_api(request):
         for module in modules
     ]
 
-@api_module_router.get("/get/{slug}/", response=ModuleList)
+@api_module_router.get("/get/{slug}/", response=ModuleList, auth=[IsSuperuser(), IsStaff()])
 def get_slug_module_api(request, slug: str):
     try:
         module = MyModules.objects.get(slug=slug, is_active=True)  # get() dan foydalanildi
@@ -62,7 +63,7 @@ def get_slug_module_api(request, slug: str):
     except MyModules.DoesNotExist:  # DoesNotExist ni () siz ishlatildi
         raise Http404("module topilmadi 404")
     
-@api_module_router.post("/create/", response=ModuleList)
+@api_module_router.post("/create/", response=ModuleList, auth=[IsSuperuser(), IsStaff()])
 def post_module_api(request, data: ModuleCreate):
     try:
         from courses.models import Course  # Course modelini import qilish
@@ -94,7 +95,7 @@ def post_module_api(request, data: ModuleCreate):
         raise HttpError(400, f"Bad Request: {str(e)}")
     
 # course update 
-@api_module_router.put("update/", response=ModuleList)
+@api_module_router.put("update/", response=ModuleList, auth=[IsSuperuser(), IsStaff()])
 def update_module_api(request, slug: str, data: ModuleCreate):
     try:
         module = MyModules.objects.get(slug=slug, is_active=True)

@@ -1,5 +1,6 @@
 from ninja import Router
 from ninja.errors import HttpError
+from .auth_permission import IsStaff, IsSuperuser
 
 # --------------- scheams ------------------
 from pydantic import BaseModel
@@ -31,7 +32,7 @@ from lessons.models import TestCase
 
 testcase_router_api = Router()
 # get test case
-@testcase_router_api.get("/", response=List[TestCaseList])
+@testcase_router_api.get("/", response=List[TestCaseList], auth=[IsSuperuser(), IsStaff()])
 def test_case_get(request):
     return [
         {
@@ -48,7 +49,7 @@ def test_case_get(request):
         for testcase in TestCase.objects.all()
     ]
 # test case get id
-@testcase_router_api.get("{id}/", response=TestCaseList)
+@testcase_router_api.get("{id}/", response=TestCaseList, auth=[IsSuperuser(), IsStaff()])
 def test_case_get(request, id: int):
     try:
         testcase = TestCase.objects.all()
@@ -68,7 +69,7 @@ def test_case_get(request, id: int):
     
 
 # testcase create
-@testcase_router_api.post("create/", response=TestCaseList)
+@testcase_router_api.post("create/", response=TestCaseList, auth=[IsSuperuser(), IsStaff()])
 def cerate_testcase_api(request, data: TestCaseCreate):
     try:
         testcase = TestCase.objects.create(**data.dict())
@@ -87,7 +88,7 @@ def cerate_testcase_api(request, data: TestCaseCreate):
         raise HttpError(403, "Nimadur Xato ketti!")
     
 # testcase update
-@testcase_router_api.put("update/", response=TestCaseList)
+@testcase_router_api.put("update/", response=TestCaseList, auth=[IsSuperuser(), IsStaff()])
 def update_testcase_api(request, id: int,data: TestCaseCreate):
     try:
         testcase = TestCase.objects.get(id=id)
@@ -111,7 +112,7 @@ def update_testcase_api(request, id: int,data: TestCaseCreate):
         raise HttpError(403, "Nimadur Xato ketti!")
     
 # testcase delete
-@testcase_router_api.delete("delete/", response=TestCaseList)
+@testcase_router_api.delete("delete/", response=TestCaseList, auth=[IsSuperuser(), IsStaff()])
 def delete_testcase_api(request, id: int,data: TestCaseCreate):
     try:
         testcase = TestCase.objects.get(id=id)
