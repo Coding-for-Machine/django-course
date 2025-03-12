@@ -32,7 +32,7 @@ class CourseCreate(BaseModel):
 # ----------------------------course api functions ----------------------
 
 # course get api -- admin uchun
-@course_api_router.get('courses-get/', response=List[CourseList], auth=[IsSuperuser(), IsStaff(), IsInGroup("Teacher")])
+@course_api_router.get('courses-get/', response=List[CourseList], auth=[IsSuperuser()])
 def course_api_get_admin(request):
     courses = Course.objects.filter(is_active=True)
     return [

@@ -58,10 +58,11 @@ MIDDLEWARE = [
 
 # JWT sozlamalari
 NINJA_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),  # 1 kun amal qiladi
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7), # 7 kun amal qiladi
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),  # 1 kun amal qiladi
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1), # 7 kun amal qiladi
     "ALGORITHM": "HS256",
-    "SIGNING_KEY": SECRET_KEY,
+    "SIGNING_KEY": SECRET_KEY+"asadbek123456789",
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 #  ---------------------------------
