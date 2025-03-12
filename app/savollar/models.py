@@ -15,7 +15,7 @@ class Quiz(TimeMixsin):
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
     description = CKEditor5Field(verbose_name='Savol', config_name='extends')
-    MyModules = models.ForeignKey(MyModules, related_name='quizzes', on_delete=models.CASCADE)
+    modules = models.ForeignKey(MyModules, related_name='quizzes', on_delete=models.CASCADE)
     time_limit = models.PositiveIntegerField(default=600)  # Sekundlarda (10 daqiqa)
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     class Meta:
@@ -49,7 +49,7 @@ class Quiz(TimeMixsin):
 
 
 class Question(TimeMixsin):
-    content_type = models.ForeignKey(ContentType, related_name="questions",on_delete=models.CASCADE)  # Model turi (Quiz yoki Topic)
+    content_type = models.ForeignKey(ContentType, related_name="questions", on_delete=models.CASCADE)  # Model turi (Quiz yoki Topic)
     object_id = models.PositiveIntegerField()  # Bog‘langan model ID si
     content_object = GenericForeignKey('content_type', 'object_id')  # GenericForeignKey
     description = CKEditor5Field(verbose_name='Savol', config_name='extends')

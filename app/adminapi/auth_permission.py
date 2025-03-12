@@ -1,54 +1,70 @@
-from ninja.security import HttpBearer
 from django.contrib.auth.models import Permission
+from ninja_jwt.authentication import JWTAuth
+from ninja.security import HttpBearer
 
-class HasSpecificPermission(HttpBearer):
-    """
-    Foydalanuvchida specific permission borligini tekshiradi.
-    """
+
+class JWTBaseAuth(HttpBearer):
+    """`JWTAuth` bilan autentifikatsiya qiluvchi bazaviy klass."""
+    
+    def authenticate(self, request, token):
+        jwt_auth = JWTAuth()
+        user = jwt_auth.authenticate(request, token)
+
+        if user and user.is_authenticated:
+            request.user = user
+            return user
+        return None
+
+
+class HasSpecificPermission(JWTBaseAuth):
+    """Foydalanuvchida berilgan permission bormi, tekshiradi."""
+    
     def __init__(self, permission_codename):
         self.permission_codename = permission_codename
 
     def authenticate(self, request, token):
-        if not request.user.is_authenticated:
-            return False
-        return request.user.has_perm(self.permission_codename)
+        user = super().authenticate(request, token)
+        return user if user and user.has_perm(self.permission_codename) else None
 
-class IsInGroup(HttpBearer):
-    """
-    Foydalanuvchi berilgan guruhga tegishli ekanligini tekshiradi.
-    """
+
+class IsInGroup(JWTBaseAuth):
+    """Foydalanuvchi berilgan guruhga tegishli ekanligini tekshiradi."""
+    
     def __init__(self, group_name):
         self.group_name = group_name
 
     def authenticate(self, request, token):
-        if not request.user.is_authenticated:
-            return False
-        return request.user.groups.filter(name=self.group_name).exists()
+        user = super().authenticate(request, token)
+        return user if user and user.groups.filter(name=self.group_name).exists() else None
 
-class IsStaff(HttpBearer):
-    """
-    Foydalanuvchi staff ekanligini tekshiradi.
-    """
-    def authenticate(self, request, token):
-        return request.user.is_authenticated and request.user.is_staff
 
-class IsSuperuser(HttpBearer):
-    """
-    Foydalanuvchi superuser ekanligini tekshiradi.
-    """
+class IsSuperuser(JWTBaseAuth):
+    """Foydalanuvchi `superuser` ekanligini tekshiradi."""
+    
     def authenticate(self, request, token):
-        return request.user.is_authenticated and request.user.is_superuser
+        user = super().authenticate(request, token)
+        return user if user and user.is_superuser else None
 
-class IsInPrimaryGroup(HttpBearer):
-    """
-    Foydalanuvchi o‘zining asosiy guruhiga tegishli ekanligini tekshiradi.
-    """
-    def authenticate(self, request, token):
-        return request.user.is_authenticated and request.user.primary_group is not None
 
-class HasSupplementaryGroup(HttpBearer):
-    """
-    Foydalanuvchi qo‘shimcha guruhlaridagi ruxsatlardan foydalanishi mumkinligini tekshiradi.
-    """
+class IsStaff(JWTBaseAuth):
+    """Foydalanuvchi `staff` ekanligini tekshiradi."""
+    
     def authenticate(self, request, token):
-        return request.user.is_authenticated and request.user.supplementary_groups.exists()
+        user = super().authenticate(request, token)
+        return user if user and user.is_staff else None
+
+
+class IsInPrimaryGroup(JWTBaseAuth):
+    """Foydalanuvchi asosiy guruhiga tegishli ekanligini tekshiradi."""
+    
+    def authenticate(self, request, token):
+        user = super().authenticate(request, token)
+        return user if user and getattr(user, "primary_group", None) else None
+
+
+class HasSupplementaryGroup(JWTBaseAuth):
+    """Foydalanuvchi qo‘shimcha guruhlaridagi ruxsatlardan foydalanishi mumkinligini tekshiradi."""
+    
+    def authenticate(self, request, token):
+        user = super().authenticate(request, token)
+        return user if user and getattr(user, "supplementary_groups", None) else None
