@@ -1,7 +1,9 @@
+from django.shortcuts import get_object_or_404
 from ninja import Router
 from pydantic import BaseModel
 from typing import List
 from django.http import Http404
+from users.models import MyUser
 from courses.models import Course
 from .auth_permission import *
 
@@ -17,7 +19,9 @@ class CourseList(BaseModel):
     thumbnail: str
     lesson_count: int
     trailer: str
+    user: int
     unlisted: bool
+
 
 class CourseCreate(BaseModel):
     title: str
@@ -28,6 +32,8 @@ class CourseCreate(BaseModel):
     trailer: str
     unlisted: bool
     slug: str  # Agar kerak bo'lsa
+    user: int
+
 
 # ----------------------------course api functions ----------------------
 
@@ -45,7 +51,8 @@ def course_api_get_admin(request):
             "thumbnail": course.thumbnail,
             "lesson_count": course.lesson_count,
             "trailer": course.trailer,
-            "unlisted": course.unlisted
+            "unlisted": course.unlisted,
+            "user": course.user.id
         }
         for course in courses
     ]
@@ -67,7 +74,9 @@ def course_api_get_slug_admin(request, course_slug: str):
             "thumbnail": course.thumbnail,
             "lesson_count": course.lesson_count,
             "trailer": course.trailer,
-            "unlisted": course.unlisted
+            "unlisted": course.unlisted,
+            "user": course.user.id
+
         }
     except Course.DoesNotExist:
         raise Http404("Darslik topilmadi!")
@@ -75,7 +84,21 @@ def course_api_get_slug_admin(request, course_slug: str):
 # course post api -- create courses
 @course_api_router.post('course-create', response=CourseList, auth=[IsSuperuser(), IsStaff(), IsInGroup("Teacher")])
 def course_api_post_admin(request, data: CourseCreate):
-    course = Course.objects.create(**data.dict())
+    
+    user = get_object_or_404(MyUser, id=data.user)  # User obyektini olish
+    
+    course = Course.objects.create(
+        title=data.title,
+        slug=data.slug,
+        price=data.price,
+        description=data.description,
+        thumbnail=data.thumbnail,
+        lesson_count=data.lesson_count,
+        trailer=data.trailer,
+        unlisted=data.unlisted,
+        user=user  # MyUser obyektini qo‘shish
+    )
+
     return {
         "id": course.id,
         "title": course.title,
@@ -85,7 +108,8 @@ def course_api_post_admin(request, data: CourseCreate):
         "thumbnail": course.thumbnail,
         "lesson_count": course.lesson_count,
         "trailer": course.trailer,
-        "unlisted": course.unlisted
+        "unlisted": course.unlisted,
+        "user": course.user.id
     }
 
 # course put api - course ni o'zgartirish
@@ -112,7 +136,9 @@ def course_api_put_admin(request, course_slug: str, data: CourseCreate):
             "thumbnail": course.thumbnail,
             "lesson_count": course.lesson_count,
             "trailer": course.trailer,
-            "unlisted": course.unlisted
+            "unlisted": course.unlisted,
+            "user": course.user.id
+
         }
     except Course.DoesNotExist:
         raise Http404("Darslik topilmadi!")

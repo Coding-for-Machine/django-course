@@ -3,6 +3,7 @@ from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, FileExtensionValidator
 
+
 # from typing import  TYPE_CHECKING
 
 # if TYPE_CHECKING:

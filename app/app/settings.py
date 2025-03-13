@@ -34,11 +34,14 @@ INSTALLED_APPS = [
     'grade.apps.GradeConfig',
 
     # Boshqa app'lar
+    # loglarni kuzatish
+    'easyaudit',
     "django_extensions",
     'corsheaders',
     'django_ckeditor_5',
     'ninja_jwt',
     'ninja_extra',
+    'ninja_jwt.token_blacklist',
 ]
 
 AUTH_USER_MODEL = "users.MyUser"
@@ -53,6 +56,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # log
+    'easyaudit.middleware.easyaudit.EasyAuditMiddleware',
 ]
 
 
@@ -63,6 +68,7 @@ NINJA_JWT = {
     "ALGORITHM": "HS256",
     "SIGNING_KEY": SECRET_KEY+"asadbek123456789",
     'AUTH_HEADER_TYPES': ('Bearer',),
+    "BLACKLIST_AFTER_ROTATION": True,
 }
 
 #  ---------------------------------

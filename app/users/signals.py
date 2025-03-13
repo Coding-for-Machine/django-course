@@ -4,8 +4,8 @@ from .models import Profile, MyUser
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
-
 # Teacher guruhi uchun ruxsatlar ro'yxati
+
 teacher_permissions = [
     "view_problems", "view_testcase", "view_course", "view_mymodule",
     "view_lesson", "view_profile", "view_comments", "view_question",
