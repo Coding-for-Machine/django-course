@@ -25,7 +25,10 @@ class Course(TimeMixsin):
     
     def __str__(self):
         return self.title
-
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
      
 
 class Enrollment(TimeMixsin):
@@ -52,9 +55,6 @@ class MyModules(TimeMixsin):
         return f"Module: {self.title} (Course: {self.course.title})"
 
     def save(self, *args, **kwargs):
-        """
-        Modul saqlanishidan oldin slugni yaratish.
-        """
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)

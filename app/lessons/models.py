@@ -20,31 +20,29 @@ class Language(TimeMixsin):
 
         super().save(*args, **kwargs)
     
-
     
-# Dars modeli - har bir modulga tegishli darslarni saqlash uchun
 class Lesson(TimeMixsin):
     module = models.ForeignKey(MyModules, related_name="lesson", on_delete=models.CASCADE)  # Modulga bog'lanadi
-    title = models.CharField(max_length=255)  # Dars nomi
-    slug = models.SlugField(unique=True)  # Dars uchun noyob identifikator
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True)
     lesson_type = models.CharField(
         max_length=50, 
-        choices=[('darslik', 'darslik'), ('probelm', 'probelm')]  # Dars turi: lecture (teorik), lab (laboratoriya)
+        choices=[('darslik', 'darslik'), ('probelm', 'probelm')]  
     )
-    locked = models.BooleanField(default=False)  # Darsni qulflash holati (yopiq yoki ochiq)
-    preview = models.BooleanField(default=False)  # Darsni preview qilish imkoniyati (tashrif buyurish)
+    locked = models.BooleanField(default=False)  
+    preview = models.BooleanField(default=False)
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     
     def __str__(self):
-        return f"Lesson: (Module: {self.module.title})"  # Dars nomi va tegishli modul nomini ko'rsatish
+        return f"Lesson: (Module: {self.module.title})"  
     
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = generate_slug_with_case(30)  # 10 uzunlikda tasodifiy slug yaratish
+            self.slug = generate_slug_with_case(30)
         super().save(*args, **kwargs)
 
     class Meta:
-        ordering = ['created_at']  # Darslar yaratish vaqtiga ko'ra tartiblanadi
+        ordering = ['created_at'] 
 
 
 class Problem(TimeMixsin):

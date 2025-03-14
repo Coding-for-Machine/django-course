@@ -9,7 +9,6 @@ from django.core.validators import MinValueValidator, FileExtensionValidator
 # if TYPE_CHECKING:
 #     from courses.models import TimeMixsin
 
-# Custom Manager (Soft Delete ishlaydi)
 class MyUserManager(BaseUserManager):
     def get_queryset(self):
         return super().get_queryset().filter(is_deleted=False)
@@ -34,7 +33,6 @@ class MyUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-# Custom User Model
 class MyUser(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = [
         ("student", "Student"),
@@ -79,12 +77,8 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         ordering = ['-created_at']
 
     def save(self, *args, **kwargs):
-        """Linux tizimiga o‘xshash guruh va huquqlarni avtomatik qo‘shish"""
-        is_new = self.pk is None  # Foydalanuvchi yangi yaratilayotganligini tekshirish
-
+        is_new = self.pk is None  
         super().save(*args, **kwargs)
-
-        # Guruhni aniqlash va qo‘shish
         group, _ = Group.objects.get_or_create(name=self.role.capitalize())
         self.primary_group = group
         self.groups.set([group])  # Faqat bitta primary guruhni o‘rnatish
@@ -101,7 +95,6 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
             self.supplementary_groups.set(all_groups)
             self.groups.set(all_groups)
 
-        super().save(*args, **kwargs)
 
 class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, primary_key=True, verbose_name="Foydalanuvchi")

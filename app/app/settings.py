@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = "users.MyUser"
 
 CORS_ALLOW_ALL_ORIGINS = True 
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -63,12 +64,12 @@ MIDDLEWARE = [
 
 # JWT sozlamalari
 NINJA_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),  # 1 kun amal qiladi
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1), # 7 kun amal qiladi
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),  
     "ALGORITHM": "HS256",
-    "SIGNING_KEY": SECRET_KEY+"asadbek123456789",
+    "SIGNING_KEY": SECRET_KEY + "asadbek123456789",
     'AUTH_HEADER_TYPES': ('Bearer',),
-    "BLACKLIST_AFTER_ROTATION": True,
+    "BLACKLIST_AFTER_ROTATION": True,  
 }
 
 #  ---------------------------------
@@ -141,7 +142,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tashkent' 
 
 USE_I18N = True
 
@@ -151,13 +152,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Statik fayllarni yig'ish uchun
 
+MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 customColorPalette = [
 
@@ -215,7 +217,7 @@ customColorPalette = [
 
 
 CKEDITOR_5_FILE_STORAGE = 'app.store.CkeditorCustomStorage'
-CKEDITOR_5_CUSTOM_CSS = 'path_to.css' # optional
+CKEDITOR_5_CUSTOM_CSS = None
 CKEDITOR_5_CONFIGS = {
 
     'default': {
@@ -335,4 +337,5 @@ CKEDITOR_5_CONFIGS = {
     }
 
 }
-CKEDITOR_5_FILE_UPLOAD_PERMISSION = "staff" 
+# CKEDITOR_5_FILE_UPLOAD_PERMISSION = "staff" 
+CKEDITOR_5_FILE_UPLOAD_PERMISSIONS = "staff"
