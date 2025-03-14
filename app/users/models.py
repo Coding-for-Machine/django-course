@@ -59,12 +59,10 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
     def delete(self, *args, **kwargs):
-        """Soft Delete: Foydalanuvchini o‘chirib tashlamasdan yashirin qiladi"""
         self.is_deleted = True
         self.save()
 
     def restore(self):
-        """Foydalanuvchini tiklash"""
         self.is_deleted = False
         self.save()
 
@@ -81,15 +79,13 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         super().save(*args, **kwargs)
         group, _ = Group.objects.get_or_create(name=self.role.capitalize())
         self.primary_group = group
-        self.groups.set([group])  # Faqat bitta primary guruhni o‘rnatish
+        self.groups.set([group]) 
 
-        # Staff bo‘lsa, unga maxsus ruxsatlar beriladi
         if self.is_staff:
             staff_group, _ = Group.objects.get_or_create(name="Staff")
             self.supplementary_groups.add(staff_group)
             self.groups.add(staff_group)
 
-        # Superuser bo‘lsa, barcha huquqlarga ega bo‘lsin
         if self.is_superuser:
             all_groups = Group.objects.all()
             self.supplementary_groups.set(all_groups)

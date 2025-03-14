@@ -1,20 +1,15 @@
 from ninja import Router
 from django.shortcuts import get_object_or_404
 from .models import Lesson, Problem, TestCase
-from .schemas import LessonSchema  # LessonSchema Pydantic modelini import qilamiz
+from .schemas import LessonSchema 
 from django.http import JsonResponse
 
-from users.api_auth import api_auth_user_required
 router = Router()
 
-@router.get("/{slug}", response=LessonSchema)#  auth=api_auth_user_required
+@router.get("/{slug}", response=LessonSchema)
 def get_lesson_by_slug(request, slug: str):
-    # Slug orqali Lesson obyektini olish
     lesson = get_object_or_404(Lesson, slug=slug)
-    # Lessonga tegishli muammolarni olish
     problems = Problem.objects.filter(lesson=lesson)
-    
-    # Lesson ma'lumotlarini yaratish
     lesson_data ={"lesson": [{
         "id": lesson.id,
         "title": lesson.title,

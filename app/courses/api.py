@@ -9,13 +9,12 @@ from .models import Course, Enrollment, MyModules
 from .schemas import CoursesListResponse, CourseSchema
 from userstatus.models import UserLessonStatus
 
-from users.api_auth import api_auth_user_or_annon
 
 api_course = Router()
 
 
 # Kurslar ro'yxatini olish va JSON formatda qaytarish
-@api_course.get("/courses/", response=CoursesListResponse, auth=api_auth_user_or_annon)
+@api_course.get("/courses/", response=CoursesListResponse)
 def get_courses(request: HttpRequest):
     if not request.user.is_authenticated:
         pass
@@ -79,7 +78,7 @@ def get_courses(request: HttpRequest):
         return response_data
 
 
-@api_course.get("/courses/{slug}", response={200: dict, 404: str}, auth=api_auth_user_or_annon)
+@api_course.get("/courses/{slug}", response={200: dict, 404: str})
 def get_course_by_slug(request: HttpRequest, slug: str):
     redis_conn = get_redis_connection("default")
     user_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown_ip'))

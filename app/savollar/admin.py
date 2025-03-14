@@ -34,29 +34,21 @@ class QuestionForm(forms.ModelForm):
             except (ValueError, TypeError, ContentType.DoesNotExist):
                 self.fields['object_id'].choices = []
 
-# ==============================
-# 2️⃣ Answer Inline (For Question Admin)
-# ==============================
+
 class AnswerInline(admin.TabularInline):
     model = Answer
-    extra = 1  # 3 ta qo'shimcha bo'sh javob variantlarini ko'rsatadi
+    extra = 1 
     min_num = 1
     fields = ('description', 'is_correct')
 
-# ==============================
-# 3️⃣ Quiz Admin
-# ==============================
 @admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):
     list_display = ('title', 'slug', 'time_limit', 'is_active', 'created_at')
     list_filter = ('title', 'is_active')
-    prepopulated_fields = {'slug': ('title',)}  # Slugni avtomatik generatsiya qilish
+    prepopulated_fields = {'slug': ('title',)} 
     search_fields = ('title', 'description')
     ordering = ('-created_at',)
 
-# ==============================
-# 4️⃣ Question Admin
-# ==============================
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
     form = QuestionForm
@@ -66,9 +58,6 @@ class QuestionAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
     inlines = [AnswerInline]
 
-# ==============================
-# 5️⃣ Answer Admin (Optional, if standalone management is needed)
-# ==============================
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
     list_display = ('description', 'question', 'is_correct')

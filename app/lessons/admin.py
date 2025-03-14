@@ -4,30 +4,27 @@ from .models import Language, Lesson, Problem, Function, TestCase
 from django.utils.html import format_html
 
 
-# Language Admin
 class LanguageAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'id')  # Ko'rsatiladigan ustunlar
-    search_fields = ('name', 'slug')  # Qidiruvni faollashtirish
-    list_filter = ('name',)  # Filtrlar qo'shish
-    prepopulated_fields = {'slug': ('name',)}  # Slugni avtomatik to'ldirish
+    list_display = ('name', 'slug', 'id')  
+    search_fields = ('name', 'slug')  
+    list_filter = ('name',)  
+    prepopulated_fields = {'slug': ('name',)}  
 
 admin.site.register(Language, LanguageAdmin)
 
 
-# Lesson Admin
 class LessonAdmin(admin.ModelAdmin):
     list_display = ('title', 'module', 'lesson_type', 'locked', 'preview', 'created_at', 'slug')
-    search_fields = ('title', 'module__title')  # Qidiruvni faollashtirish
+    search_fields = ('title', 'module__title') 
     list_filter = ('lesson_type', 'locked', 'preview')
-    prepopulated_fields = {'slug': ('title',)}  # Slugni avtomatik to'ldirish
+    prepopulated_fields = {'slug': ('title',)} 
 
 admin.site.register(Lesson, LessonAdmin)
 
 class TestCaseInline(TabularInline):
     model = TestCase
-    extra = 4  # Dastlabki yangi TestCase qo'shishni ko'rsatadi
+    extra = 4 
 
-# Problem Admin
 class ProblemAdmin(admin.ModelAdmin):
     list_display = ('title', 'lesson', 'difficulty', 'slug', 'created_at')
     search_fields = ('title', 'lesson__title', 'difficulty')
@@ -39,7 +36,6 @@ admin.site.register(Problem, ProblemAdmin)
 
 
 
-# Function Admin
 class FunctionAdmin(admin.ModelAdmin):
     list_display = ('language', 'problem', 'function', 'created_at')
     search_fields = ('language__name', 'problem__title', 'function')

@@ -27,13 +27,13 @@ class MyUserAdmin(BaseUserAdmin):
     list_display = ('email', 'first_name', 'last_name', 'is_staff')
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)
-    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')  # 'groups' qaytarildi
-    filter_horizontal = ('groups', 'user_permissions')  # Bu qator endi to'g'ri ishlaydi 'groups' olib tashlandi
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
+    filter_horizontal = ('groups', 'user_permissions')
 
 class ProfileAdmin(admin.ModelAdmin):
     list_display=['created_at',"updated_at",'bio', 'profile_icon']
     # icon 
     def profile_icon(self, obj):
-        return format_html('<i class="fa-regular fa-address-card"></i>')  # Iconni qo‘shish
+        return format_html('<i class="fa-regular fa-address-card"></i>')
     profile_icon.short_description = 'Profile-Icon'
 admin.site.register(Profile, ProfileAdmin)

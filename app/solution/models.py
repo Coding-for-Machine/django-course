@@ -4,7 +4,6 @@ from lessons.models import Language, Problem
 from userstatus.models import UserProblemStatus
 from savollar.models import Question, Quiz
 from users.models import MyUser
-# from lessons.models import Problem, Language
 
 from courses.models import TimeMixsin
 
@@ -42,7 +41,6 @@ class Solution(TimeMixsin):
         )
         solution.save()
 
-        # Agar bu yechim qabul qilinsa, foydalanuvchi bu muammoni hal qilgan deb saqlash
         if solution.is_accepted:
             UserProblemStatus.mark_completed(user, problem)
 
@@ -66,7 +64,6 @@ class UserQuizResult(TimeMixsin):
 
     @classmethod
     def log_quiz_result(cls, user, quiz, correct_answers, total_questions):
-        """Foydalanuvchining quiz natijalarini saqlash"""
         score = correct_answers * 10  # Har bir to‘g‘ri javob uchun 10 ball
         result, created = cls.objects.get_or_create(user=user, quiz=quiz)
         result.correct_answers = correct_answers

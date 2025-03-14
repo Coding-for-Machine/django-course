@@ -1,6 +1,5 @@
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
-
 from .generate_slug import generate_slug_with_case
 from courses.models import MyModules
 from courses.models import TimeMixsin

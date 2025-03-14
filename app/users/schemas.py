@@ -26,11 +26,21 @@ class UserSchema(BaseModel):
 
 # Profil ma'lumotlari
 class ProfileSchema(BaseModel):
+    id: Optional[str]
     first_name: Optional[str]
     last_name: Optional[str]
     image: Optional[str]
     bio: Optional[str]
     age: int
 
+    class Config:
+        from_attributes = True
+
+class ProfileUpdateSchema(BaseModel):
+    first_name: Optional[str]
+    last_name: Optional[str]
+    image: Optional[str]
+    bio: Optional[str]
+    age: int
     class Config:
         from_attributes = True

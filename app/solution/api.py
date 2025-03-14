@@ -8,7 +8,6 @@ from ninja import Router
 # from .run_code_api import format_code_push
 from .schemas import *
 from .run_code_api import post_server
-from users.api_auth import api_auth_user_required
 
 from typing import List
 solution_url_api = Router()
