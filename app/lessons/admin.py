@@ -14,9 +14,9 @@ admin.site.register(Language, LanguageAdmin)
 
 
 class LessonAdmin(admin.ModelAdmin):
-    list_display = ('title', 'module', 'lesson_type', 'locked', 'preview', 'created_at', 'slug')
+    list_display = ('title', 'module', 'lesson_type', 'preview', 'created_at', 'slug')
     search_fields = ('title', 'module__title') 
-    list_filter = ('lesson_type', 'locked', 'preview')
+    list_filter = ('lesson_type', 'preview')
     prepopulated_fields = {'slug': ('title',)} 
 
 admin.site.register(Lesson, LessonAdmin)

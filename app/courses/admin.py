@@ -4,15 +4,12 @@ from django.utils.text import slugify
 
 # Course Admin
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('title', 'slug', 'price', 'lesson_count', 'unlisted', 'created_at', 'updated_at')
+    list_display = ('title', 'slug', 'price', 'lesson_count', 'created_at', 'updated_at')
     search_fields = ('title', 'slug')
-    list_filter = ('unlisted',)
+    list_filter = ('title',)
     prepopulated_fields = {'slug': ('title',)}
 
     def save_model(self, request, obj, form, change):
-        """
-        Kursni saqlashdan oldin slugni sozlash va lesson_count ni hisoblash.
-        """
         if not obj.slug:
             obj.slug = slugify(obj.title)
 

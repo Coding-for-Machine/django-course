@@ -5,7 +5,7 @@ from django.utils.text import slugify
 
 #  base timemixis
 class TimeMixsin(models.Model):
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     class Meta:
@@ -20,7 +20,6 @@ class Course(TimeMixsin):
     thumbnail = models.URLField()
     lesson_count = models.PositiveIntegerField(blank=True, null=True)
     trailer = models.URLField(blank=True, null=True)
-    unlisted = models.BooleanField(default=False)
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     
     def __str__(self):
@@ -29,7 +28,11 @@ class Course(TimeMixsin):
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
-     
+        
+    class Meta:
+        indexes = [
+            models.Index(fields=["created_at", "updated_at", "is_active"])
+        ]
 
 class Enrollment(TimeMixsin):
     user = models.ForeignKey(MyUser, related_name='enrollments', on_delete=models.CASCADE)

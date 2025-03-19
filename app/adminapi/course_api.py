@@ -5,11 +5,15 @@ from typing import List
 from django.http import Http404
 from users.models import MyUser
 from courses.models import Course
-from .auth_permission import *
+from .auth_permission import IsInGroup, IsSuperuser, IsStaff
 
 course_api_router = Router()
 
 # --------------------------------schema course ------------------------
+class UserSchema(BaseModel):
+    id: int
+    email: str
+
 class CourseList(BaseModel):
     id: int
     title: str
@@ -19,8 +23,9 @@ class CourseList(BaseModel):
     thumbnail: str
     lesson_count: int
     trailer: str
-    user: int
+    user: UserSchema
     unlisted: bool
+
 
 
 class CourseCreate(BaseModel):
@@ -32,14 +37,17 @@ class CourseCreate(BaseModel):
     trailer: str
     unlisted: bool
     slug: str  # Agar kerak bo'lsa
-    user: int
+    user: UserSchema
 
 
 # ----------------------------course api functions ----------------------
 
 # course get api -- admin uchun
-@course_api_router.get('courses-get/', response=List[CourseList], auth=[IsSuperuser()])
+@course_api_router.get('courses-get/', response=List[CourseList], auth=[IsSuperuser(), IsInGroup("Teacher"), IsStaff()])
 def course_api_get_admin(request):
+    user = request.user
+    # if user.has_perm("courses.view_course") and user.groups.filter:
+    #     pass
     courses = Course.objects.filter(is_active=True)
     return [
         {
@@ -51,8 +59,13 @@ def course_api_get_admin(request):
             "thumbnail": course.thumbnail,
             "lesson_count": course.lesson_count,
             "trailer": course.trailer,
-            "unlisted": course.unlisted,
-            "user": course.user.id
+            "unlisted": True,
+            "user": [
+                    {
+                        "id": course.user.id,
+                        "email": course.user.email
+                    }
+                ]
         }
         for course in courses
     ]
@@ -74,7 +87,7 @@ def course_api_get_slug_admin(request, course_slug: str):
             "thumbnail": course.thumbnail,
             "lesson_count": course.lesson_count,
             "trailer": course.trailer,
-            "unlisted": course.unlisted,
+            "unlisted": True,
             "user": course.user.id
 
         }
@@ -82,7 +95,7 @@ def course_api_get_slug_admin(request, course_slug: str):
         raise Http404("Darslik topilmadi!")
 
 # course post api -- create courses
-@course_api_router.post('course-create', response=CourseList, auth=[IsSuperuser(), IsStaff(), IsInGroup("Teacher")])
+@course_api_router.post('course-create/', response=CourseList, auth=[IsSuperuser(), IsStaff(), IsInGroup("Teacher")])
 def course_api_post_admin(request, data: CourseCreate):
     
     user = get_object_or_404(MyUser, id=data.user)  # User obyektini olish

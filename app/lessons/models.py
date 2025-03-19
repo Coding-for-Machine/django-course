@@ -22,13 +22,12 @@ class Language(TimeMixsin):
     
 class Lesson(TimeMixsin):
     module = models.ForeignKey(MyModules, related_name="lesson", on_delete=models.CASCADE)  # Modulga bog'lanadi
-    title = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True)
+    title = models.CharField(max_length=255, db_index=True)
+    slug = models.SlugField(unique=True, db_index=True)
     lesson_type = models.CharField(
         max_length=50, 
         choices=[('darslik', 'darslik'), ('probelm', 'probelm')]  
     )
-    locked = models.BooleanField(default=False)  
     preview = models.BooleanField(default=False)
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     
@@ -40,8 +39,11 @@ class Lesson(TimeMixsin):
             self.slug = generate_slug_with_case(30)
         super().save(*args, **kwargs)
 
-    class Meta:
-        ordering = ['created_at'] 
+    # class Meta:
+    #     ordering = ['created_at'] 
+    #     indexes = [
+    #         models.Index(["user", "created"])
+    #     ]
 
 
 class Problem(TimeMixsin):
@@ -67,6 +69,7 @@ class Problem(TimeMixsin):
         if not self.slug:
             self.slug = generate_slug_with_case(30)  # 10 uzunlikda tasodifiy slug yaratish
         super().save(*args, **kwargs)
+
 
 class Function(TimeMixsin):
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
