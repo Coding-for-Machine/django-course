@@ -25,3 +25,71 @@ DataBase Url--> https://www.drawdb.app/editor?shareId=e6780827401c08519b0fe845f2
    ```bash
    git clone https://github.com/Coding-for-Machine/django-course.git
    cd django-course
+
+
+### 2️⃣ Virtual muhit yaratish va faollashtirish:
+```bash
+python -m venv venv
+source venv/bin/activate  # MacOS/Linux
+echo "Virtual muhit faollashtirildi!"
+```
+Windows uchun:
+```bash
+venv\Scripts\activate  
+echo "Virtual muhit faollashtirildi!"
+```
+
+### 3️⃣ Kerakli kutubxonalarni o‘rnatish:
+```bash
+pip install -r requirements.txt
+echo "Barcha kerakli kutubxonalar o‘rnatildi!"
+```
+
+### 4️⃣ Ma’lumotlar bazasini sozlash:
+`.env` faylini yaratib, quyidagi sozlamalarni qo‘shing:
+```bash
+echo "DB_NAME=course_db" >> .env
+echo "DB_USER=postgres" >> .env
+echo "DB_PASSWORD=yourpassword" >> .env
+echo "DB_HOST=localhost" >> .env
+echo "DB_PORT=5432" >> .env
+echo ".env fayli yaratildi!"
+```
+
+### 5️⃣ Ma’lumotlar bazasini yaratish:
+```bash
+python manage.py migrate
+echo "Ma’lumotlar bazasi migratsiya qilindi!"
+```
+
+### 6️⃣ Admin foydalanuvchi yaratish:
+```bash
+python manage.py createsuperuser
+```
+
+### 7️⃣ Serverni ishga tushirish:
+```bash
+python manage.py runserver
+echo "Server ishga tushdi! http://127.0.0.1:8000"
+```
+
+## 🚀 Deploy qilish (Docker bilan)
+
+### 1️⃣ Docker imajni yaratish va konteynerni ishga tushirish:
+```bash
+docker-compose up --build -d
+echo "Docker konteynerlari ishga tushdi!"
+```
+
+### 2️⃣ Admin panelga kirish:
+```bash
+xdg-open http://localhost/admin || open http://localhost/admin
+echo "Admin paneliga kirish uchun: http://localhost:8000/admin"
+```
+
+
+## 👨‍💻 Loyiha muallifi:
+- **Ism:** Asadbek  
+- **LinkedIn:** [Profil](https://www.linkedin.com/in/coding-for-machine)  
+- **GitHub:** [Profil](https://github.com/Coding-for-Machine)  
+
