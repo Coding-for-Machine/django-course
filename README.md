@@ -77,7 +77,11 @@ echo "Server ishga tushdi! http://127.0.0.1:8000"
 ## 📂 API Endpointlar
 
 - **Kurslar ro‘yxatini olish** → `GET /api/courses/`
-- **Yangi kurs yaratish** → `POST /api/courses/`
+  ![image](https://github.com/user-attachments/assets/f3ab61a5-6a04-4f21-b7a2-4bb5eb6ac85a)
+
+- **Yangi kurs yaratish--> Faqat Admin, Staff yoki Teacher Groups da bulganlar uchin ** → `POST /api/admin/courses/`
+- ![image](https://github.com/user-attachments/assets/72d8fa72-c18e-4afa-b32e-6dc622fac2cd)
+
 - **Foydalanuvchi ro‘yxatdan o‘tishi** → `POST /api/user/register`
   ![image](https://github.com/user-attachments/assets/c06cff8f-6487-4d63-afbc-8c24b38de8f5)
 
