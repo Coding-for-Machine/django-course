@@ -2,7 +2,7 @@
 
 **42.uz ga o‘xshagan kurs platformasi**  
 Django va PostgreSQL asosida kurslar yaratish, boshqarish va foydalanuvchilarni ro‘yxatdan o‘tkazish imkonini beruvchi tizim.
-
+DataBase Url--> https://www.drawdb.app/editor?shareId=e6780827401c08519b0fe845f28622c8
 ## 📌 Xususiyatlari:
 - **Foydalanuvchilar tizimi** (O‘qituvchi, O‘quvchi, Admin)
 - **Kurslarni yaratish va boshqarish**
