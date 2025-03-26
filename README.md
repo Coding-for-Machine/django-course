@@ -73,6 +73,17 @@ python manage.py runserver
 echo "Server ishga tushdi! http://127.0.0.1:8000"
 ```
 
+## 📂 API Endpointlar
+
+- **Kurslar ro‘yxatini olish** → `GET /api/courses/`
+- **Yangi kurs yaratish** → `POST /api/courses/`
+- **Foydalanuvchi ro‘yxatdan o‘tishi** → `POST /api/user/register`
+  ![image](https://github.com/user-attachments/assets/c06cff8f-6487-4d63-afbc-8c24b38de8f5)
+
+- **Login qilish** → `POST /api/user/login/`
+![image](https://github.com/user-attachments/assets/20e5eca4-20c0-4d70-a0e7-4a232efe7754)
+
+---
 ## 🚀 Deploy qilish (Docker bilan)
 
 ### 1️⃣ Docker imajni yaratish va konteynerni ishga tushirish:
@@ -83,7 +94,6 @@ echo "Docker konteynerlari ishga tushdi!"
 
 ### 2️⃣ Admin panelga kirish:
 ```bash
-xdg-open http://localhost/admin || open http://localhost/admin
 echo "Admin paneliga kirish uchun: http://localhost:8000/admin"
 ```
 
