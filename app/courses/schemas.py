@@ -12,7 +12,6 @@ class CourseResponse(BaseModel):
     thumbnail: str
     lesson_count: Optional[int] = 0  # Default to 0 if None
     trailer: Optional[str] = None
-    unlisted: bool
 
     class Config:
         orm_mode = True
