@@ -70,6 +70,7 @@ python manage.py createsuperuser
 ### 7️⃣ Serverni ishga tushirish:
 ```bash
 python manage.py runserver
+redis-server --port 6380
 echo "Server ishga tushdi! http://127.0.0.1:8000"
 ```
 
